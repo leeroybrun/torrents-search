@@ -1,0 +1,60 @@
+{
+    "name": "smartorrent",
+    "home": "http://www.smartorrent.com/",
+    "login": {
+        "url": "http://www.smartorrent.com/dispatcheur.php",
+        "headers": {
+            "Referer": "http://www.smartorrent.com/",
+            "Content-Type": "application/x-www-form-urlencoded",
+            "Accept": "application/json, text/javascript, */*; q=0.01",
+            "X-Requested-With": "XMLHttpRequest",
+            "Connection": "keep-alive"
+        },
+        "fieldsToFill": {
+            "username": "login_username",
+            "password": "login_password",
+        },
+        "fields": {
+        	"op": "user_login",
+        	"login_remember": "on"
+        },
+        "check": "a[href='/?page=logout']"
+    },
+    "search": {
+        "url": "http://www.smartorrent.com/",
+        "method": "GET",
+        "headers": {
+            "Referer": "http://www.t411.me/torrents/search/",
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+            "Connection": "keep-alive"
+        },
+        "fieldsToFill": {
+            "query": "term"
+        },
+        "fields": {
+            "default": {
+                "page": "search",
+                "ordre": "sd"
+            },
+            "options": {
+                "movie": {
+                    "cat": "11"
+                }
+            }
+        }
+    },
+    "parse": {
+        "item": "table#parcourir tbody tr",
+        "detailsLink": "td.nom div+a",
+        "id": "td.nom div+a",
+        "idRegex": "/([0-9]+)/",
+        "title": "td.nom div+a",
+        "size": "td.taille",
+        "seeders": "td.seed",
+        "leechers": "td.leech"
+    },
+    "download": {
+        "url": "http://www.smartorrent.com/?page=download",
+        "idField": "tid"
+    }
+}

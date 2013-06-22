@@ -1,0 +1,26 @@
+{
+  "name": "torrents-search",
+  "version": "0.1.0",
+  "author": "Leeroy Brun <leeroy.brun@gmail.com>",
+  "description": "Search torrents on private trackers websites (t411, Smartorrent)",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/leeroybrun/node-torrents-search.git"
+  },
+  "keywords": [
+    "torrents",
+    "t411",
+    "smartorrent",
+    "private tracker",
+    "tracker"
+  ], 
+  "license": "MIT",
+  "dependencies" : {
+      "request":  "*",
+      "cheerio":  "*"
+  },
+  "engines": [
+    "node"
+  ],
+  "main": "./lib/trackers.js"
+}
