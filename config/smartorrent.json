@@ -12,12 +12,13 @@
         },
         "fieldsToFill": {
             "username": "login_username",
-            "password": "login_password",
+            "password": "login_password"
         },
         "fields": {
         	"op": "user_login",
         	"login_remember": "on"
         },
+        "csrf": false,
         "check": "a[href='/?page=logout']"
     },
     "search": {

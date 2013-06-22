@@ -18,6 +18,7 @@
             "url": "/",
             "remember": "1"
         },
+        "csrf": false,
         "check": "a[href='/users/logout/']"
     },
     "search": {

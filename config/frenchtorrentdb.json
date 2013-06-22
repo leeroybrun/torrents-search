@@ -1,0 +1,70 @@
+{
+    "name": "frenchtorrentdb",
+    "home": "http://www.frenchtorrentdb.com/",
+    "login": {
+        "url": "http://www.frenchtorrentdb.com/?section=LOGIN",
+        "headers": {
+            "Referer": "http://www.frenchtorrentdb.com/?section=LOGIN&Func=access_denied&access_needed",
+            "Content-Type": "application/x-www-form-urlencoded",
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+            "Connection": "keep-alive"
+        },
+        "fieldsToFill": {
+            "username": "username",
+            "password": "password"
+        },
+        "fields": {
+            "url": "/",
+            "remember": "1"
+        },
+        "csrf": {
+            "formUrl": "http://www.frenchtorrentdb.com/?section=LOGIN",
+            "field": "secure_login"
+        },
+        "check": "a[href='/?section=LOGOUT']"
+    },
+    "search": {
+        "url": "http://www.frenchtorrentdb.com/",
+        "method": "POST",
+        "headers": {
+            "Referer": "http://www.frenchtorrentdb.com/?section=TORRENTS",
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+            "Connection": "keep-alive"
+        },
+        "fieldsToFill": {
+            "query": "name"
+        },
+        "fields": {
+            "default": {
+                "search": "Rechercher",
+                "exact": "1",
+                "section": "TORRENTS",
+                "order_by": "seeders",
+                "order": "DESC"
+            },
+            "options": {
+                "movie": {
+                    "adv_cat[m][1]": "71",
+                    "group": "films",
+                    "year": "",
+                    "year_end": ""
+                }
+            }
+        }
+    },
+    "parse": {
+        "item": ".results_index .DataGrid ul",
+        "detailsLink": "a.torrents_name_link",
+        "dlFields"
+        "id": "td+td+td a",
+        "idRegex": "id=([0-9]+)",
+        "title": "td+td a:first-child",
+        "size": "td+td+td+td+td+td",
+        "seeders": "td+td+td+td+td+td+td+td",
+        "leechers": "td+td+td+td+td+td+td+td+td"
+    },
+    "download": {
+        "url": "http://www.t411.me/torrents/download/",
+        "idField": "id"
+    }
+}

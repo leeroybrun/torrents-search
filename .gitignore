@@ -1,3 +1,4 @@
 node_modules/
 *.sublime*
 examples/
+.DS_Store
