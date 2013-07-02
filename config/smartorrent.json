@@ -47,15 +47,24 @@
     "parse": {
         "item": "table#parcourir tbody tr",
         "detailsLink": "td.nom div+a",
-        "id": "td.nom div+a",
-        "idRegex": "/([0-9]+)/",
         "title": "td.nom div+a",
         "size": "td.taille",
         "seeders": "td.seed",
-        "leechers": "td.leech"
+        "leechers": "td.leech",
+        "custom": {
+            "id": {
+                "selector": "td.nom div+a",
+                "regex": "/([0-9]+)/"
+            }
+        }
     },
     "download": {
-        "url": "http://www.smartorrent.com/?page=download",
-        "idField": "tid"
+        "url": "http://www.smartorrent.com/",
+        "params": {
+            "page": "download",
+            "custom": {
+                "tid": "id"
+            }
+        }
     }
 }

@@ -50,15 +50,23 @@
     "parse": {
         "item": "table.results tbody tr",
         "detailsLink": "td+td a:first-child",
-        "id": "td+td+td a",
-        "idRegex": "id=([0-9]+)",
         "title": "td+td a:first-child",
         "size": "td+td+td+td+td+td",
         "seeders": "td+td+td+td+td+td+td+td",
-        "leechers": "td+td+td+td+td+td+td+td+td"
+        "leechers": "td+td+td+td+td+td+td+td+td",
+        "custom": {
+            "id": {
+                "selector": "td+td+td a",
+                "regex": "id=([0-9]+)"
+            }
+        }
     },
     "download": {
         "url": "http://www.t411.me/torrents/download/",
-        "idField": "id"
+        "params": {
+            "custom": {
+                "id": "id"
+            }
+        }
     }
 }

@@ -25,7 +25,7 @@
     },
     "search": {
         "url": "http://www.frenchtorrentdb.com/",
-        "method": "POST",
+        "method": "GET",
         "headers": {
             "Referer": "http://www.frenchtorrentdb.com/?section=TORRENTS",
             "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
@@ -55,16 +55,34 @@
     "parse": {
         "item": ".results_index .DataGrid ul",
         "detailsLink": "a.torrents_name_link",
-        "dlFields"
-        "id": "td+td+td a",
-        "idRegex": "id=([0-9]+)",
-        "title": "td+td a:first-child",
-        "size": "td+td+td+td+td+td",
-        "seeders": "td+td+td+td+td+td+td+td",
-        "leechers": "td+td+td+td+td+td+td+td+td"
+        "title": "a.torrents_name_link",
+        "size": "li.torrents_size",
+        "seeders": "li.torrents_seeders",
+        "leechers": "li.torrents_leechers",
+        "custom": {
+            "id": {
+                "selector": "li.torrents_download a",
+                "regex": "&id=([0-9]+)"
+            },
+            "uid": {
+                "selector": "li.torrents_download a",
+                "regex": "&uid=([0-9]+)"
+            },
+            "hash": {
+                "selector": "li.torrents_download a",
+                "regex": "&hash=([a-z0-9]+)"
+            }
+        }
     },
     "download": {
-        "url": "http://www.t411.me/torrents/download/",
-        "idField": "id"
+        "url": "http://www.frenchtorrentdb.com/",
+        "params": {
+            "section": "DOWNLOAD",
+            "custom": {
+                "id": "id",
+                "uid": "uid",
+                "hash": "hash"
+            }
+        }
     }
 }
