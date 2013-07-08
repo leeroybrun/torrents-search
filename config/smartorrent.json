@@ -60,6 +60,7 @@
     },
     "download": {
         "url": "http://www.smartorrent.com/",
+        "method": "GET",
         "params": {
             "page": "download",
             "custom": {

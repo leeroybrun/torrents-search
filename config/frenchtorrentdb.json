@@ -76,6 +76,7 @@
     },
     "download": {
         "url": "http://www.frenchtorrentdb.com/",
+        "method": "GET",
         "params": {
             "section": "DOWNLOAD",
             "custom": {
