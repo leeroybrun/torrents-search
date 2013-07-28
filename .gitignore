@@ -1,4 +1,4 @@
 node_modules/
 *.sublime*
-examples/
+examples/_*
 .DS_Store
