@@ -62,7 +62,9 @@
         "url": "http://www.smartorrent.com/",
         "method": "GET",
         "params": {
-            "page": "download",
+            "static": {
+                "page": "download"
+            },
             "custom": {
                 "tid": "id"
             }

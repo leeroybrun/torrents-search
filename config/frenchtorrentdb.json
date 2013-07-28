@@ -78,7 +78,9 @@
         "url": "http://www.frenchtorrentdb.com/",
         "method": "GET",
         "params": {
-            "section": "DOWNLOAD",
+            "static": {
+                "section": "DOWNLOAD"
+            },
             "custom": {
                 "id": "id",
                 "uid": "uid",
