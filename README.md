@@ -1,8 +1,10 @@
-node-torrents-search
-====================
+# node-torrents-search
 
-Node module used for searching torrents on private trackers websites.
+Node module used to search torrents on private trackers websites.
 
-## Todo :
-- FrenchTorrentDB : more fields on the download link, need to find a good way for getting and storing them. Add "customFields" on the torrent object ?
-- When parsing torrent data, generate direct download link and store it
+## Currently supported trackers
+- t411
+- Smartorrent
+- FrenchTorrentDB
+
+You can easily add new trackers' config files inside the `config` directory.
