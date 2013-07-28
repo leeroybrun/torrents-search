@@ -50,7 +50,8 @@ var config = [
 		}
 	},
 	...
-];```
+];
+```
 
 The callback function takes only an `error` argument. If an error occured during the config files loading, it will contain the error. Ff no error occured, it will be set to `null`.
 
