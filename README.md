@@ -17,8 +17,7 @@ You can find examples of using the module inside the `examples/` folder.
 Here is the general principe of using the module :
 
 1. Load trackers you want to use
-2. Login to all trackers (optional)
-3. Use other available methods (search, dlTorrent).
+2. Use other available methods (search, dlTorrent).
 
 When using all the methods related to the tracker (search, dlTorrent), the module will start by checking if we already are logged. If we are not, it will automatically log you in.
 Once logged in, the module will assume that we are logged in for the next 5 minutes. After this delay, it will recheck the connection status on the tracker.
@@ -27,7 +26,7 @@ Once logged in, the module will assume that we are logged in for the next 5 minu
 
 Here is the list of all available methods of the module.
 
-### trackers.load(config, callback)
+### trackers.setConfig(config, callback)
 
 Load the trackers defined inside the `config` object.
 
@@ -59,4 +58,4 @@ The callback function takes only an `error` argument. If an error occured during
 
 ### trackers.search(searchText, type, callback)
 
-### trackers.dlTorrent(trackerName, torrentCustom, callback)
+### trackers.download(trackerName, torrentCustom, callback)

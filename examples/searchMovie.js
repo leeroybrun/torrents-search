@@ -1,11 +1,9 @@
-var trackers = require('../lib/trackers.js');
+var trackers = require('../lib/torrents.js');
 
-// Activate the debug, will output more messages (verbose)
 global.debug = true;
 
-// Load only the wanted trackers, and pass the USERNAME and PASSWORD for each tracker
-trackers.load([
-	{
+trackers.setConfig([
+	/*{
 		name: 't411',
 		login: {
 			username: 'USERNAME',
@@ -18,7 +16,7 @@ trackers.load([
 			username: 'USERNAME',
 			password: 'PASSWORD'
 		}
-	},
+	},*/
 	{
 		name: 'frenchtorrentdb',
 		login: {
@@ -29,28 +27,17 @@ trackers.load([
 ], function(err) {
 	if(err) { console.log('Error loading trackers.'); return; }
 
-	// Login to all loaded trackers
-	trackers.login(function(status) {
-		if(status === false) { console.log('Login error...'); return; }
+	trackers.search('spiderman', 'movie', function(err, torrents) {
+		if(err) { console.log('Error ! '+ err); return; }
 
-		console.log('Successful login.');
+		console.log(torrents.length +' torrents found !');
+		//console.log(torrents);
 
-		// Search the movie on all loaded trackers
-		trackers.search('spiderman', 'movie', function(err, torrents) {
-			if(err) { console.log('Error ! '+ err); return; }
+		console.log('Download 1th torrent...');
+		trackers.download(torrents[0].tracker, torrents[0].custom, function(error, torrentFile) {
+			if(error) { console.log(error); return; }
 
-			console.log(torrents.length +' torrents found !');
-			//console.log(torrents);
-
-			console.log('Download 1th torrent...');
-			// Download the first torrent found 
-			// Will output the .torrent file content, you can then save it to disk if you need to.
-			trackers.dlTorrent(torrents[0].tracker, torrents[0].custom, function(error, torrentFile) {
-				if(error) { console.log(error); return; }
-
-				// Print the torrent file content
-				console.log(torrentFile);
-			});
+			console.log(torrentFile);
 		});
 	});
 });
