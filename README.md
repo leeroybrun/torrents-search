@@ -57,3 +57,7 @@ The callback function takes only an `error` argument. If an error occured during
 ### trackers.search(searchText, type, callback)
 
 ### trackers.download(trackerName, torrentCustom, callback)
+
+## Warning
+
+This module is currently in active development, so the methods, config, etc can change a lot. Please do not use it in production environment or be very carefull when doing "npm update".
