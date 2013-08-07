@@ -2,7 +2,7 @@ var trackers = require('../lib/torrents.js');
 
 global.debug = true;
 
-trackers.setConfig([
+trackers.loadTrackers([
 	/*{
 		name: 't411',
 		login: {
