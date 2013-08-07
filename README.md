@@ -33,23 +33,17 @@ Load the trackers defined inside the `config` object.
 Config object format :
 
 ```javascript
-var config = [
-	{
-		name: 'TRACKER-CONFIG-FILE-NAME-1',
-		login: {
-			username: 'USERNAME',
-			password: 'PASSWORD'
-		}
+var config = {
+	'TRACKER-CONFIG-FILE-NAME-1': {
+		'username': 'USERNAME',
+		'password': 'PASSWORD'
 	},
-	{
-		name: 'TRACKER-CONFIG-FILE-NAME-2',
-		login: {
-			username: 'USERNAME',
-			password: 'PASSWORD'
-		}
+	'TRACKER-CONFIG-FILE-NAME-2': {
+		'username': 'USERNAME',
+		'password': 'PASSWORD'
 	},
 	...
-];
+};
 ```
 
 The callback function takes only an `error` argument. If an error occured during the config files loading, it will contain the error. Ff no error occured, it will be set to `null`.

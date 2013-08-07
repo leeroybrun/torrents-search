@@ -2,29 +2,20 @@ var trackers = require('../lib/torrents.js');
 
 global.debug = true;
 
-trackers.loadTrackers([
-	/*{
-		name: 't411',
-		login: {
-			username: 'USERNAME',
-			password: 'PASSWORD'
-		}
+trackers.loadTrackers({
+	/*'t411': {
+		username: 'USERNAME',
+		password: 'PASSWORD'
 	},
-	{
-		name: 'smartorrent',
-		login: {
-			username: 'USERNAME',
-			password: 'PASSWORD'
-		}
+	'smartorrent': {
+		username: 'USERNAME',
+		password: 'PASSWORD'
 	},*/
-	{
-		name: 'frenchtorrentdb',
-		login: {
-			username: 'USERNAME',
-			password: 'PASSWORD'
-		}
+	'frenchtorrentdb': {
+		username: 'USERNAME',
+		password: 'PASSWORD'
 	}
-], function(err) {
+}, function(err) {
 	if(err) { console.log('Error loading trackers.'); return; }
 
 	trackers.search('spiderman', 'movie', function(err, torrents) {

@@ -2,53 +2,37 @@ var trackers = require('../lib/torrents.js');
 
 global.debug = true;
 
-trackers.loadTrackersSync([
-	/*{
-		name: 't411',
-		login: {
-			username: 'USERNAME',
-			password: 'PASSWORD'
-		}
+trackers.loadTrackersSync({
+	/*'t411': {
+		username: 'USERNAME',
+		password: 'PASSWORD'
 	},
-	{
-		name: 'smartorrent',
-		login: {
-			username: 'USERNAME',
-			password: 'PASSWORD'
-		}
+	'smartorrent': {
+		username: 'USERNAME',
+		password: 'PASSWORD'
 	},*/
-	{
-		name: 'frenchtorrentdb',
-		login: {
-			username: 'USERNAME',
-			password: 'PASSWORD'
-		}
+	'frenchtorrentdb': {
+		username: 'USERNAME',
+		password: 'PASSWORD'
 	}
-]);
+});
 
-trackers.setCredentials([
-	/*{
-		name: 't411',
-		login: {
-			username: 'NEW_USERNAME',
-			password: 'NEW_PASSWORD'
-		}
+// Do some stuff...
+
+trackers.setCredentials({
+	/*'t411': {
+		username: 'NEW_USERNAME',
+		password: 'NEW_PASSWORD'
 	},
-	{
-		name: 'smartorrent',
-		login: {
-			username: 'NEW_USERNAME',
-			password: 'NEW_PASSWORD'
-		}
+	'smartorrent': {
+		username: 'NEW_USERNAME',
+		password: 'NEW_PASSWORD'
 	},*/
-	{
-		name: 'frenchtorrentdb',
-		login: {
-			username: 'NEW_USERNAME',
-			password: 'NEW_PASSWORD'
-		}
+	'frenchtorrentdb': {
+		username: 'NEW_USERNAME',
+		password: 'NEW_PASSWORD'
 	}
-]);
+});
 
 trackers.search('spiderman', 'movie', function(err, torrents) {
 	if(err) { console.log('Error ! '+ err); return; }
