@@ -26,7 +26,7 @@ Once logged in, the module will assume that we are logged in for the next 5 minu
 
 Here is the list of all available methods of the module.
 
-### trackers.setConfig(config, callback)
+### trackers.loadTrackers(config, callback)
 
 Load the trackers defined inside the `config` object.
 
@@ -53,6 +53,10 @@ var config = [
 ```
 
 The callback function takes only an `error` argument. If an error occured during the config files loading, it will contain the error. Ff no error occured, it will be set to `null`.
+
+### trackers.loadTrackersSync(config)
+
+### trackers.setCredentials(config)
 
 ### trackers.login(callback)
 
