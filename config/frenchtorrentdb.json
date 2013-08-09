@@ -62,15 +62,15 @@
         "custom": {
             "id": {
                 "selector": "li.torrents_download a",
-                "regex": "&id=([0-9]+)"
+                "regex": "(&|&amp;)id=([0-9]+)"
             },
             "uid": {
                 "selector": "li.torrents_download a",
-                "regex": "&uid=([0-9]+)"
+                "regex": "(&|&amp;)uid=([0-9]+)"
             },
             "hash": {
                 "selector": "li.torrents_download a",
-                "regex": "&hash=([a-z0-9]+)"
+                "regex": "(&|&amp;)hash=([a-z0-9]+)"
             }
         }
     },
