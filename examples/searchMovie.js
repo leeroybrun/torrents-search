@@ -1,8 +1,8 @@
-var trackers = require('../lib/torrents.js');
+var TorrentsSearch = require('../lib/torrents.js');
 
 global.debug = true;
 
-trackers.loadTrackers({
+var tSearch = new TorrentsSearch({
 	/*'t411': {
 		username: 'USERNAME',
 		password: 'PASSWORD'
@@ -15,20 +15,17 @@ trackers.loadTrackers({
 		username: 'USERNAME',
 		password: 'PASSWORD'
 	}
-}, function(err) {
-	if(err) { console.log('Error loading trackers.'); return; }
+});
 
-	trackers.search('spiderman', 'movie', function(err, torrents) {
-		if(err) { console.log('Error ! '+ err); return; }
+tSearch.search('spiderman', 'movie', function(err, torrents) {
+	if(err) { console.log('Error ! '+ err); return; }
 
-		console.log(torrents.length +' torrents found !');
-		//console.log(torrents);
+	console.log(torrents.length +' torrents found !');
 
-		console.log('Download 1th torrent...');
-		trackers.download(torrents[0].tracker, torrents[0].custom, function(error, torrentFile) {
-			if(error) { console.log(error); return; }
+	console.log('Download 1th torrent...');
+	tSearch.download(torrents[0].tracker, torrents[0].custom, function(error, torrentFile) {
+		if(error) { console.log(error); return; }
 
-			console.log(torrentFile);
-		});
+		console.log(torrentFile);
 	});
 });
