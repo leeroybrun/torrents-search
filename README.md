@@ -1,5 +1,7 @@
 # node-torrents-search
 
+[![NPM](https://nodei.co/npm/torrents-search.png)](https://nodei.co/npm/torrents-search/)
+
 Node module used to search torrents on private trackers websites.
 
 ## Currently supported trackers
