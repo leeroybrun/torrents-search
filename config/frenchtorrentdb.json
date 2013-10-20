@@ -2,7 +2,7 @@
     "name": "frenchtorrentdb",
     "home": "http://www.frenchtorrentdb.com/",
     "login": {
-        "url": "http://www.frenchtorrentdb.com/?section=LOGIN",
+        "url": "http://www.frenchtorrentdb.com/?section=LOGIN&ajax=1",
         "headers": {
             "Referer": "http://www.frenchtorrentdb.com/?section=LOGIN&Func=access_denied&access_needed",
             "Content-Type": "application/x-www-form-urlencoded",
@@ -17,10 +17,7 @@
             "url": "/",
             "remember": "1"
         },
-        "csrf": {
-            "formUrl": "http://www.frenchtorrentdb.com/?section=LOGIN",
-            "field": "secure_login"
-        },
+        "csrf": false,
         "check": "a[href='/?section=LOGOUT']"
     },
     "search": {
