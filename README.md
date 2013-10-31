@@ -64,6 +64,15 @@ The callback function takes only an `error` argument. If an error occured during
 
 This module is currently in active development, so the methods, config, etc can change a lot. Please do not use it in production environment or be very carefull when doing "npm update".
 
+## Refactor
+
+I need to do a big refactor to this module :
+
+- Custom scripts for providers, not config files. This way we can handle more specific ways to login/search for each tracker.
+- Configuration : custom logger, log level, etc
+- Use async if needed to have a more beautiful code
+- 
+
 Licence
 ======================
 (The MIT License)
