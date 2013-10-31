@@ -68,7 +68,7 @@ This module is currently in active development, so the methods, config, etc can 
 
 I need to do a big refactor to this module :
 
-- Custom scripts for providers, not config files. This way we can handle more specific ways to login/search for each tracker.
+- Custom scripts for providers, not config files. This way we can handle more specific ways to login/search for each tracker. We will have a base class which all providers will inherit.
 - Configuration : custom logger, log level, etc
 - Use async if needed to have a more beautiful code
 - Send errors when no trackers are configured (when trying to search, download, etc)
