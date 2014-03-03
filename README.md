@@ -1,6 +1,6 @@
 # node-torrents-search
 
-[![NPM](https://nodei.co/npm/torrents-search.png)](https://nodei.co/npm/torrents-search/)
+[![NPM](https://nodei.co/npm/torrents-search.png)](https://nodei.co/npm/torrents-search/) [![David DM](https://david-dm.org/leeroybrun/node-torrents-search.png)](https://david-dm.org/leeroybrun/node-torrents-search "David DM")
 
 Node module used to search torrents on private trackers websites.
 
