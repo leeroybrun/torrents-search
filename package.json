@@ -1,6 +1,6 @@
 {
   "name": "torrents-search",
-  "version": "0.3.2",
+  "version": "0.4.0",
   "author": "Leeroy Brun <leeroy.brun@gmail.com>",
   "description": "Search torrents on private trackers websites (t411, Smartorrent, FrenchTorrentDB)",
   "repository": {
@@ -16,11 +16,12 @@
   ], 
   "license": "MIT",
   "dependencies" : {
-      "request":  "*",
-      "cheerio":  "*"
+      "request":  "2.34.0",
+      "cheerio":  "0.13.1",
+      "async":    "0.2.10"
   },
   "engines": [
     "node"
   ],
-  "main": "./lib/torrents.js"
+  "main": "./lib/TorrentsSearch.js"
 }

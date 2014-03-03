@@ -10,68 +10,145 @@ Node module used to search torrents on private trackers websites.
 - Smartorrent
 - FrenchTorrentDB
 
-You can easily add new trackers' config files inside the `config` directory.
+You can easily add new trackers by creating a file in `lib/trackers`.
 
-## How to use it
+## Install
 
-You can find examples of using the module inside the `examples/` folder.
+```shell
+npm install torrents-search
+```
 
-Here is the general principe of using the module :
+## Usage
 
-1. Load trackers you want to use
-2. Use other available methods (search, dlTorrent).
+```javascript
+var TorrentsSearch = require('torrents-search');
 
-When using all the methods related to the tracker (search, dlTorrent), the module will start by checking if we already are logged. If we are not, it will automatically log you in.
-Once logged in, the module will assume that we are logged in for the next 5 minutes. After this delay, it will recheck the connection status on the tracker.
+// Custom logger
+var myLogger = {
+	info: function(msg) {
+		console.log(msg);
+	},
 
-## Methods
+	error: function(msg) {
+		console.error(msg);
+	}
+};
+
+var torrents = new TorrentsSearch({
+	logger: myLogger, // Optional
+	timeout: 100000 // Optional
+});
+
+torrents.loadTrackers(function(err) {
+	if(err) { console.log(err); return; }
+
+	// Display all loaded trackers
+	console.log('Loaded trackers :', torrents.getTrackers());
+
+	// Enable a tracker
+	torrents.enableTracker('t411');
+	torrents.setCredentials('t411', 'USERNAME', 'PASSWORD');
+
+	// Enable a tracker
+	torrents.enableTracker('FrenchTorrentDB');
+	torrents.setCredentials('FrenchTorrentDB', 'USERNAME', 'PASSWORD');
+
+	// Enable a tracker
+	torrents.enableTracker('Smartorrent');
+	torrents.setCredentials('Smartorrent', 'USERNAME', 'PASSWORD');
+
+	// Search torrents on all enabled trackers
+	torrents.search('spiderman', {type: 'movie', quality: 'dvdrip'}, function(err, torrentsFound) {
+		if(err) { console.error(err); return; }
+
+		console.log(torrentsFound.length +' torrent(s) found.');
+
+		console.log('Downloading first torrent :');
+		torrents.download(torrentsFound[0], function(err, torrentFileBuffer) {
+			if(err) { console.error(err); return; }
+
+			console.log(torrentFileBuffer);
+		});
+	});
+});
+```
+
+## Options
+
+* `logger` This let you define a custom logger. It should have two methods : `info` and `error`. If you just want to log errors, just create an empty `info` method. Default is an empty logger that will do nothing.
+* `timeout` Define the desired timeout (milliseconds) for requests sent to trackers. Default is 10000 (10s). This is a way to protect us from slow trackers who can block others.
+
+## API
 
 Here is the list of all available methods of the module.
 
-### trackers.loadTrackers(config, callback)
+* `loadTrackers(callback)`
 
-Load the trackers defined inside the `config` object.
+    Load all the trackers in the `lib/trackers` folder.
+    You need to call this before calling any other method.
+    All trackers loaded are disabled by default.
 
-Config object format :
+    The callback function takes only an `error` argument.
 
-```javascript
-var config = {
-	'TRACKER-CONFIG-FILE-NAME-1': {
-		'username': 'USERNAME',
-		'password': 'PASSWORD'
-	},
-	'TRACKER-CONFIG-FILE-NAME-2': {
-		'username': 'USERNAME',
-		'password': 'PASSWORD'
-	},
-	...
-};
-```
+* `getTrackers()`
 
-The callback function takes only an `error` argument. If an error occured during the config files loading, it will contain the error. Ff no error occured, it will be set to `null`.
+    Return an array with the names of all loaded trackers.
 
-### trackers.loadTrackersSync(config)
+* `enableTracker(trackerName)`
 
-### trackers.setCredentials(config)
+    Enable the specified tracker.
 
-### trackers.login(callback)
+* `disableTracker(trackerName)`
 
-### trackers.search(searchText, type, callback)
+    Disable the specified tracker.
 
-### trackers.download(trackerName, torrentCustom, callback)
+* `setCredentials(trackerName, username, password)`
+
+    Set the username/password used for the tracker.
+
+* `login(callback)`
+
+    Login on all enabled trackers.
+    This is automatically done when using a method requiring login (search, download).
+
+    The callback only takes an `error` argument.
+
+* `search(query, options, callback)`
+
+    Search the specified `query` on all enabled trackers.
+
+    Options is an object with the following values :
+
+    * `type` : `movie` or `tvshow` (only movie is supported yet)
+    * `quality` : `dvdrip`, `bluray`, `screener` (WIP)
+
+    The callback takes 2 arguments :
+
+    * `error`
+    * `torrentsFound` An array with all the torrents found on enabled trackers.
+
+* `download(torrent, callback)`
+
+    Download the specified `torrent`.
+
+    The callback takes 2 arguments :
+
+    * `error`
+    * `torrentFileBuff` A buffer of the downloaded torrent file.
 
 ## Warning
 
-This module is currently in active development, so the methods, config, etc can change a lot. Please do not use it in production environment or be very carefull when doing "npm update".
+This module is currently in active development, the API can change a lot.
+Please set the version on your package.json dependencies, this way you will not be affected by any `npm update`.
 
-## Refactor
+## TODO
 
-I need to do a big refactor to this module :
-
-- Custom scripts for providers, not config files. This way we can handle more specific ways to login/search for each tracker. We will have a base class which all providers will inherit.
-- Configuration : custom logger, log level, etc
-- Use async if needed to have a more beautiful code
-- Send errors when no trackers are configured (when trying to search, download, etc)
+* Add support for generic torrent search (no categories)
+* Add tests
+* Add TV Shows support
+* Add more quality options
+* Custom errors
+* Add more trackers
 
 Licence
 ======================
