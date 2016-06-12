@@ -11,40 +11,39 @@ var myLogger = {
 	}
 };
 
-var torrents = new TorrentsSearch({
+var search = new TorrentsSearch({
 	logger: myLogger, // Optional
 	timeout: 100000 // Optional
 });
 
-torrents.loadTrackers(function(err) {
-	if(err) { console.log(err); return; }
+search.loadTrackers()
+	.then(() => {
+		// Display all loaded trackers
+		console.log('Loaded trackers :', search.getTrackers());
 
-	// Display all loaded trackers
-	console.log('Loaded trackers :', torrents.getTrackers());
+		// Enable a tracker
+		search.enableTracker('t411');
+		search.setCredentials('t411', 'USERNAME', 'PASSWORD');
 
-	// Enable a tracker
-	torrents.enableTracker('t411');
-	torrents.setCredentials('t411', 'USERNAME', 'PASSWORD');
+		// Enable a tracker
+		search.enableTracker('FrenchTorrentDB');
+		search.setCredentials('FrenchTorrentDB', 'USERNAME', 'PASSWORD');
 
-	// Enable a tracker
-	torrents.enableTracker('FrenchTorrentDB');
-	torrents.setCredentials('FrenchTorrentDB', 'USERNAME', 'PASSWORD');
+		// Enable a tracker
+		search.enableTracker('Smartorrent');
+		search.setCredentials('Smartorrent', 'USERNAME', 'PASSWORD');
+	})
+	.then(() => {
+		// Search torrents on all enabled trackers
+		return search.search('spiderman', {type: 'movie'}).then((torrents) => {
+			console.log(torrents.length +' torrent(s) found.');
 
-	// Enable a tracker
-	torrents.enableTracker('Smartorrent');
-	torrents.setCredentials('Smartorrent', 'USERNAME', 'PASSWORD');
-
-	// Search torrents on all enabled trackers
-	torrents.search('spiderman', {type: 'movie', quality: 'dvdrip'}, function(err, torrentsFound) {
-		if(err) { console.error(err); return; }
-
-		console.log(torrentsFound.length +' torrent(s) found.');
-
-		console.log('Downloading first torrent :');
-		torrents.download(torrentsFound[0], function(err, torrentFileBuffer) {
-			if(err) { console.error(err); return; }
-
-			console.log(torrentFileBuffer);
+			console.log('Downloading first torrent :');
 		});
+	})
+	.then(() => {
+		return search.download(torrents[0]);
+	})
+	.then((torrentFileBuffer) => {
+		console.log(torrentFileBuffer);
 	});
-});

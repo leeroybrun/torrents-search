@@ -1,6 +1,6 @@
 {
   "name": "torrents-search",
-  "version": "0.4.1",
+  "version": "1.0.0",
   "author": "Leeroy Brun <leeroy.brun@gmail.com>",
   "description": "Search torrents on private trackers websites (t411, Smartorrent, FrenchTorrentDB)",
   "repository": {
@@ -13,15 +13,24 @@
     "smartorrent",
     "private tracker",
     "tracker"
-  ], 
+  ],
   "license": "MIT",
-  "dependencies" : {
-      "request":  "2.34.0",
-      "cheerio":  "0.13.1",
-      "async":    "0.2.10"
+  "dependencies": {
+    "async": "^0.2.10",
+    "cheerio": "^0.13.1",
+    "extend": "^3.0.0",
+    "request": "^2.72.0"
+  },
+  "devDependencies": {
+    "babel-preset-es2015": "^6.9.0",
+    "babel-register": "^6.9.0"
   },
   "engines": [
     "node"
   ],
-  "main": "./lib/TorrentsSearch.js"
+  "scripts": {
+    "build": "babel src --presets babel-preset-es2015 --out-dir dist",
+    "prepublish": "npm run build"
+  },
+  "main": "./dist/torrents-search.js"
 }
