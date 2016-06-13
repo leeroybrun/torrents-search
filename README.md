@@ -143,12 +143,22 @@ Please set the version on your package.json dependencies, this way you will not 
 
 ## TODO
 
-* Add support for generic torrent search (no categories)
+* Check : https://github.com/SchizoDuckie/DuckieTV/blob/angular/js/services/TorrentSearchEngines/GenericTorrentSearchEngine.js
+* Update README/Examples with new API
 * Add tests
-* Add TV Shows support
-* Add more quality options
-* Custom errors
 * Add more trackers
+    * Cpasbien
+		* torrentfrancais
+		* omgtorrent
+		* zetorrents
+		* http://www.ultimate-torrent.com/
+		* http://www.qctorrent.io/login
+		* http://www.zone-torrent.net/
+		* http://www.megatorrent.biz/
+		* lien-torrent
+		* http://torrentz.eu/
+		* http://www.torrenthounds.com/
+		* https://isohunt.to/
 
 Licence
 ======================

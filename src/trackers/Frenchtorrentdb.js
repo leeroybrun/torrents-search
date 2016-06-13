@@ -12,8 +12,8 @@ class Frenchtorrentdb extends Tracker {
       home:       this.baseUrl +'/',
       login:      this.baseUrl +'/account-login.php',
       loginCheck: this.baseUrl +'/',
-      search:     this.baseUrl +'/',
-      download:   this.baseUrl +'/'
+      search:     this.baseUrl +'/torrents-search.php',
+      download:   this.baseUrl +'/download.php'
     };
 
     this._cats = {
@@ -68,24 +68,20 @@ class Frenchtorrentdb extends Tracker {
 
   _getParseData() {
     return Promise.resolve({
-      item: '.results_index .DataGrid ul',
-      detailsLink: 'a.torrents_name_link',
-      title: 'a.torrents_name_link',
-      size: 'li.torrents_size',
-      seeders: 'li.torrents_seeders',
-      leechers: 'li.torrents_leechers',
+      item: 'table.ttable_headinner tr.t-row',
+      detailsLink: 'td:nth-child(2) a',
+      title: 'td:nth-child(2) a', // TODO: get "title" attribute to have full torrent name
+      size: 'td:nth-child(6)',
+      seeders: 'td:nth-child(7)',
+      leechers: 'td:nth-child(8)',
       data: {
         'id': {
-          selector: 'li.torrents_download a',
-          regex: '(&|&amp;)id=([0-9]+)'
+          selector: 'td:nth-child(3)',
+          regex: '(&|&amp;|?)id=([0-9]+)'
         },
-        'uid': {
-          selector: 'li.torrents_download a',
-          regex: '(&|&amp;)uid=([0-9]+)'
-        },
-        'hash': {
-          selector: 'li.torrents_download a',
-          regex: '(&|&amp;)hash=([a-z0-9]+)'
+        'filename': {
+          selector: 'td:nth-child(3)',
+          regex: '(&|&amp;)name=([a-zA-Z0-9_% .-]+)"'
         }
       }
     });
@@ -95,10 +91,8 @@ class Frenchtorrentdb extends Tracker {
     return Promise.resolve({
       method: 'GET',
       fields: {
-        'section': 'DOWNLOAD',
         'id': torrent.data.id,
-        'uid': torrent.data.uid,
-        'hash': torrent.data.hash
+        'name': torrent.data.filename
       },
       headers: {
         'Referer': this.baseUrl

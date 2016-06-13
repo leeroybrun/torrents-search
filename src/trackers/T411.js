@@ -16,10 +16,12 @@ class T411 extends Tracker {
     this._cats = {
       'movie': {
         'cat': '210',
-        'subcat': '631',
-        'term[17][]': '541'
+        'subcat': '631'
       },
-      'tvshow': {}
+      'tvshow': {
+        'cat': '210',
+        'subcat': '433'
+      }
     };
   }
 
@@ -32,7 +34,7 @@ class T411 extends Tracker {
     // If not logged in or more than 5 minutes ago, we presume that we are not logged anymore and we need to check again
     this._login.status = false;
 
-    // TODO: add check if logged in. Call a method and check for an error
+    // TODO: add check if logged in. Call a method and check for an eventual error
   },
 
   /**
@@ -45,7 +47,7 @@ class T411 extends Tracker {
           return reject(err);
         }
 
-        retuen resolve();
+        return resolve();
       });
     });
   }
