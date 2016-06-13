@@ -1,7 +1,7 @@
-var TorrentsSearch = require('..');
+const TorrentsSearch = require('..');
 
 // Custom logger
-var myLogger = {
+const myLogger = {
 	info: function(msg) {
 		console.log(msg);
 	},
@@ -11,7 +11,7 @@ var myLogger = {
 	}
 };
 
-var search = new TorrentsSearch({
+const search = new TorrentsSearch({
 	logger: myLogger, // Optional
 	timeout: 100000 // Optional
 });
@@ -35,13 +35,12 @@ search.loadTrackers()
 	})
 	.then(() => {
 		// Search torrents on all enabled trackers
-		return search.search('spiderman', {type: 'movie'}).then((torrents) => {
-			console.log(torrents.length +' torrent(s) found.');
-
-			console.log('Downloading first torrent :');
-		});
+		return search.search('spiderman', {type: 'movie'});
 	})
-	.then(() => {
+	.then((torrents) => {
+		console.log(torrents.length +' torrent(s) found.');
+
+		console.log('Downloading first torrent :');
 		return search.download(torrents[0]);
 	})
 	.then((torrentFileBuffer) => {

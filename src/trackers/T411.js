@@ -1,7 +1,8 @@
-import T411 from 't411';
+import T411Client from 't411';
+import extend from 'extend';
 
 import Tracker from '../Tracker';
-import Torrent from './torrent';
+import Torrent from '../torrent';
 
 class T411 extends Tracker {
   constructor(options) {
@@ -11,7 +12,9 @@ class T411 extends Tracker {
 
     this.baseUrl = 'http://www.t411.ch';
 
-    this.client = new T411();
+    this.loginRequired = true;
+
+    this.client = new T411Client();
 
     this._cats = {
       'movie': {
@@ -25,7 +28,7 @@ class T411 extends Tracker {
     };
   }
 
-  isLogged: function() {
+  isLogged() {
     // Check if already logged in less than 5 minutes ago
     if(this._login.status && (Date.now() - this._login.lastLogin) < 300000) {
       return Promise.resolve(true);
@@ -35,12 +38,12 @@ class T411 extends Tracker {
     this._login.status = false;
 
     // TODO: add check if logged in. Call a method and check for an eventual error
-  },
+  }
 
   /**
    *  Check if we are logged in on the tracker, and if not -> do the login
    */
-  login: function() {
+  login() {
     return new Promise((resolve, reject) => {
       this.client.auth(this._login.username, this._login.password, (err) => {
         if(err) {
@@ -55,7 +58,7 @@ class T411 extends Tracker {
   /**
    *  Search for torrents on the tracker
    */
-  search: function(text, options) {
+  search(text, options) {
     if (typeof text === 'undefined') {
       return Promise.reject(new Error('Please provide a text to search.'));
     }
@@ -81,7 +84,7 @@ class T411 extends Tracker {
   /**
    *  Parse tracker's search page results
    */
-  parse: function(result) {
+  parse(result) {
     const torrents = [];
 
     result.torrents.forEach((torrent) => {
@@ -105,7 +108,7 @@ class T411 extends Tracker {
   /**
    *  Download a .torrent on the specified tracker
    */
-  download: function(torrent) {
+  download(torrent) {
     return new Promise((resolve, reject) => {
       this.client.download(torrent.data.id, (err, buf) => {
         if(err) {
@@ -113,7 +116,7 @@ class T411 extends Tracker {
         }
 
         return resolve(buf);
-      })
+      });
     });
   }
 }

@@ -1,5 +1,4 @@
 import Tracker from '../Tracker';
-import cheerio from 'cheerio';
 
 class Frenchtorrentdb extends Tracker {
   constructor(options) {
@@ -7,11 +6,13 @@ class Frenchtorrentdb extends Tracker {
 
     this.name = 'FrenchTorrentDB';
 
+    this.loginRequired = true;
+
     this.baseUrl = 'http://www.frenchtorrentdb.net';
-    this._urls = {
-      home:       this.baseUrl +'/',
+    this._endpoints = {
+      home:       this.baseUrl +'/index.php',
       login:      this.baseUrl +'/account-login.php',
-      loginCheck: this.baseUrl +'/',
+      loginCheck: this.baseUrl +'/index.php',
       search:     this.baseUrl +'/torrents-search.php',
       download:   this.baseUrl +'/download.php'
     };
@@ -29,11 +30,11 @@ class Frenchtorrentdb extends Tracker {
   }
 
   _checkLoginSuccess(body) {
-    return (body.indexOf('account-logout.php') != -1);
+    return (body.indexOf('account-logout.php') !== -1);
   }
 
   _getLoginData() {
-    return {
+    return Promise.resolve({
       method: 'POST',
       fields: {
         'username': this._login.username,
@@ -46,10 +47,10 @@ class Frenchtorrentdb extends Tracker {
         'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
         'Connection': 'keep-alive'
       }
-    };
-  },
+    });
+  }
 
-  _getSearchData(query, options, callback) {
+  _getSearchData(query) {
     return Promise.resolve({
       method: 'GET',
       fields: {
@@ -64,24 +65,30 @@ class Frenchtorrentdb extends Tracker {
         'Connection': 'keep-alive'
       }
     });
-  },
+  }
 
   _getParseData() {
     return Promise.resolve({
       item: 'table.ttable_headinner tr.t-row',
-      detailsLink: 'td:nth-child(2) a',
-      title: 'td:nth-child(2) a', // TODO: get "title" attribute to have full torrent name
-      size: 'td:nth-child(6)',
-      seeders: 'td:nth-child(7)',
-      leechers: 'td:nth-child(8)',
+      fields: {
+        detailsUrl: ['td:nth-child(2) a', 'href'],
+        name: ['td:nth-child(2) a', 'title'],
+        size: 'td:nth-child(6)',
+        seeders: 'td:nth-child(7)',
+        leechers: 'td:nth-child(8)'
+      },
       data: {
         'id': {
-          selector: 'td:nth-child(3)',
-          regex: '(&|&amp;|?)id=([0-9]+)'
+          selector: 'td:nth-child(3) a',
+          attr: 'href',
+          regex: '(&|&amp;|\\?)id=([0-9]+)',
+          matchWanted: 1
         },
         'filename': {
-          selector: 'td:nth-child(3)',
-          regex: '(&|&amp;)name=([a-zA-Z0-9_% .-]+)"'
+          selector: 'td:nth-child(3) a',
+          attr: 'href',
+          regex: '(&|&amp;)name=([a-zA-Z0-9_% .-]+)',
+          matchWanted: 1
         }
       }
     });

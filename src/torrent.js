@@ -1,3 +1,5 @@
+import parseTorrentName from 'parse-torrent-name';
+
 class Torrent {
   constructor(data) {
     this.detailsUrl = data.detailsUrl || null;
@@ -10,10 +12,12 @@ class Torrent {
     this.data = data.data || {};
 
     // Parse torrent name to get informations about quality, etc
-    this.infos = parseTorrentName(this.name);
+    this.infos = (this.name) ? parseTorrentName(this.name) : {};
   }
 
   download() {
-    return this.tracker.download(this);
+    return this._tracker.download(this);
   }
 }
+
+module.exports = Torrent;

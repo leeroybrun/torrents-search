@@ -1,9 +1,7 @@
 import fs from 'fs';
 import path from 'path';
-import extend from 'extend';
 import events from 'events';
 
-import Tracker from './tracker';
 import defaultLogger from './logger';
 
 class TorrentsSearch extends events.EventEmitter {
@@ -44,7 +42,7 @@ class TorrentsSearch extends events.EventEmitter {
     return new Promise((resolve, reject) => {
       fs.readdir(this.trackersDir, (err, files) => {
         if(err) {
-          this.logger.error(err);
+          this.logger.error('Cannot load trackers from filesystem.', err);
           return reject(err);
         }
 
@@ -61,7 +59,7 @@ class TorrentsSearch extends events.EventEmitter {
   enableTracker(trackerName) {
     var tracker = this._findTracker(trackerName);
 
-    if(tracker != null) {
+    if(tracker !== null) {
       tracker.enabled = true;
 
       this.emit('tracker:enabled', tracker);
@@ -76,7 +74,7 @@ class TorrentsSearch extends events.EventEmitter {
   disableTracker(trackerName) {
     var tracker = this._findTracker(trackerName);
 
-    if(tracker != null) {
+    if(tracker !== null) {
       tracker.enabled = false;
 
       this.emit('tracker:disabled', tracker);
@@ -90,7 +88,7 @@ class TorrentsSearch extends events.EventEmitter {
 
   setCredentials(trackerName, username, password) {
     var tracker = this._findTracker(trackerName);
-    if(tracker != null) {
+    if(tracker !== null) {
       tracker.setCredentials(username, password);
       return true;
     } else {
@@ -109,7 +107,7 @@ class TorrentsSearch extends events.EventEmitter {
         return;
       }
 
-      promises.push(new Promise((resolve, reject) => {
+      promises.push(new Promise((resolve) => {
         this.logger.info('['+tracker.name+'] Start login...');
         tracker.login().then(() => {
           this.logger.info('['+tracker.name+'] Logged in !');
@@ -120,13 +118,13 @@ class TorrentsSearch extends events.EventEmitter {
 
           return resolve();
         }).catch((reason) => {
-          this.logger.error(reason);
+          this.logger.error('['+tracker.name+'] Error during login process.', reason);
 
           this.emit('tracker:loginError', tracker);
 
           return resolve();
         });
-      });
+      }));
     });
 
     return Promise.all(promises).then(() => {
@@ -135,16 +133,16 @@ class TorrentsSearch extends events.EventEmitter {
   }
 
   search(searchText, type) {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       const promises = [];
 
-      const torrentsFound = [];
+      let torrentsFound = [];
 
       this.login().then((loggedInTrackers) => {
         loggedInTrackers.forEach((tracker) => {
           this.logger.info('['+tracker.name+'] Starting search for "'+ searchText +'"...');
 
-          promises.push(new Promise((resolve, reject) => {
+          promises.push(new Promise((resolve) => {
             tracker.search(searchText, type).then((torrents) => {
               if(torrents.length === 0) {
                 this.logger.info('['+tracker.name+'] No torrent found for "'+ searchText +'".');
@@ -158,7 +156,7 @@ class TorrentsSearch extends events.EventEmitter {
 
               return resolve();
             }).catch((reason) => {
-              this.logger.error('['+tracker.name+'] Error during search : '+ reason +'.');
+              this.logger.error('['+tracker.name+'] Error during search', reason);
 
               this.emit('tracker:torrentsSearchError', reason);
 
@@ -186,17 +184,17 @@ class TorrentsSearch extends events.EventEmitter {
           return reject(new Error('Tracker not enabled.'));
         }
       } else {
-        this.logger.error('['+trackerName+'] Cannot download torrent. Tracker not found.');
+        this.logger.error('['+tracker.name+'] Cannot download torrent. Tracker not found.');
         return reject(new Error('Tracker not found.'));
       }
     });
   }
 
-  _findTracker: function(trackerName) {
+  _findTracker(trackerName) {
     var tracker = null;
 
     this.trackers.forEach(function(t) {
-      if(t.name == trackerName) {
+      if(t.name === trackerName) {
         tracker = t;
       }
     });

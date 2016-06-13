@@ -1,6 +1,5 @@
 import request from 'request';
 import cheerio from 'cheerio';
-import async from 'async';
 import extend from 'extend';
 
 import Torrent from './torrent';
@@ -19,8 +18,9 @@ class Tracker {
 
     this.name = '';
     this.enabled = false;
+    this.loginRequired = false;
 
-    this._urls: {
+    this._endpoints = {
       'home':       '',
       'login':      '',
       'loginCheck': '',
@@ -31,7 +31,7 @@ class Tracker {
     this._cats = {
       'movie': {},
       'tvshow': {}
-    }
+    };
 
     this._login = {
       status: false,
@@ -50,26 +50,26 @@ class Tracker {
   /**
    *  Set credentials for the tracker
    */
-  setCredentials: function(username, password) {
+  setCredentials(username, password) {
     this._login.username = username;
     this._login.password = password; // TODO: find more secure way to store password?
-  },
+  }
 
   /**
    *  Check if we are logged in on tracker
    *      - Last login < 5 mins ago -> we presume we are logged in
    *      - Last login > 5 mins ago -> we fetch the tracker's "loginCheck" url and checkLoginSuccess
    */
-  isLogged: function() {
+  isLogged() {
     // Check if already logged in less than 5 minutes ago
-    if(this._login.status && (Date.now() - this._login.lastLogin) < 300000) {
+    if(!this.loginRequired || (this._login.status && (Date.now() - this._login.lastLogin) < 300000)) {
       return Promise.resolve(true);
     }
 
     // If not logged in or more than 5 minutes ago, we presume that we are not logged anymore and we need to check again
     this._login.status = false;
 
-    return this._request({url: this._urls.loginCheck, method: 'GET'}).then((body) => {
+    return this._request({ url: this._endpoints.loginCheck, method: 'GET' }).then((body) => {
       if(!this._checkLoginSuccess(body)) {
         return Promise.resolve(false);
       }
@@ -77,28 +77,34 @@ class Tracker {
       this._login.status = true;
       this._login.lastLogin = Date.now();
 
-      return Promise.resolve(true);
+      return true;
     });
-  },
+  }
 
   /**
    *  Check if we are logged in on the tracker, and if not -> do the login
    */
-  login: function() {
+  login() {
     return new Promise((resolve, reject) => {
       this.isLogged().then((status) => {
         if(status === true) {
           return resolve(); // This way we stop the waterfall, we are already logged in
         }
 
-        return this._getLoginData((data) => {
+        this._getLoginData().then((data) => {
           return this._request({
-            url: this._urls.login,
+            url: ('url' in data) ? data.url : this._endpoints.login,
             method: data.method,
             form: data.fields,
             headers: data.headers
           });
-        }).then(() => {
+        }).then((body) => {
+          if(!this._endpoints.loginCheck) {
+            return Promise.resolve(body);
+          }
+
+          return this._request({ url: this._endpoints.loginCheck, method: 'GET' });
+        }).then((body) => {
           // Login successful
           if(this._checkLoginSuccess(body) === false) {
             return reject(new Error('An error occured during the login process.'));
@@ -111,14 +117,14 @@ class Tracker {
         }).catch((reason) => {
           return reject(reason);
         });
-      })
+      });
     });
   }
 
   /**
    *  Search for torrents on the tracker
    */
-  search: function(text, options) {
+  search(text, options) {
     if (typeof text === 'undefined') {
       return Promise.reject(new Error('Please provide a text to search.'));
     }
@@ -127,14 +133,16 @@ class Tracker {
     options.type = options.type || null;
 
     return this.login()
-      .then(this._getSearchData)
+      .then(() => {
+        return this._getSearchData(text, options);
+      })
       .then((data) => {
         if(this._cats[options.type]) {
           data.fields = extend(data.fields, this._cats[options.type]);
         }
 
         return this._request({
-          url: this._urls.search,
+          url: ('url' in data) ? data.url : this._endpoints.search,
           method: data.method,
           headers: data.headers,
           params: data.fields
@@ -145,10 +153,123 @@ class Tracker {
       });
   }
 
+  _getFieldData($elm, field) {
+    let selector = null;
+    let attr = null;
+    let regex = null;
+    let matchWanted = 1;
+
+    // Field just a selector string
+    if (typeof field === 'string') {
+      selector = field;
+    // Field is an array of ['selector', 'attribute', 'regexp']
+    } else if (Array.isArray(field)) {
+      selector    = field[0];
+      attr        = (field[1]) ? field[1] : null;
+      regex       = (field[2]) ? field[2] : null;
+      matchWanted = (field[3]) ? field[3] : matchWanted;
+    // Field is an object of type {selector: 'selector', attr: 'attribute', re: 'regexp']
+    } else if (typeof field === 'object') {
+      selector    = field.selector;
+      attr        = (field.attr) ? field.attr : null;
+      regex       = (field.regex) ? field.regex : null;
+      matchWanted = (field.matchWanted) ? field.matchWanted : matchWanted;
+    }
+
+    if(!selector) {
+      return null;
+    }
+
+    let $fieldElm = $elm.find(selector);
+
+    if($fieldElm.length === 0) {
+      return null;
+    }
+
+    $fieldElm = $fieldElm.eq(0);
+
+    if(!$fieldElm) {
+      return null;
+    }
+
+    let value = null;
+    if(attr !== null) {
+      if($fieldElm.attr(attr)) {
+        value = $fieldElm.attr(attr).trim();
+      }
+    } else {
+      value = $fieldElm.text().trim();
+    }
+
+    if(regex !== null) {
+      let matches = value.match(new RegExp(regex));
+      if(matches !== null && matches.length > matchWanted) {
+        value = matches[matchWanted+1].trim();
+      }
+    }
+
+    return value;
+  }
+
+  _parseSizeToMB(size) {
+    size = (typeof size !== 'undefined' && size !== null) ? size : '0 MB';
+    var sizeA = size.split(/\s{1}/); // size split into value and unit
+
+    var newSize = null; // size converted to MB
+    switch (sizeA[1].toUpperCase()) {
+      case 'B':
+      case 'BYTES':
+      case 'O':
+          newSize = (parseFloat(sizeA[0]) / 1000 / 1000).toFixed(2);
+          break;
+      case 'KB':
+      case 'KO':
+          newSize = (parseFloat(sizeA[0]) / 1000).toFixed(2);
+          break;
+      case 'MB':
+      case 'MO':
+          newSize = (parseFloat(sizeA[0])).toFixed(2);
+          break;
+      case 'GB':
+      case 'GO':
+          newSize = (parseFloat(sizeA[0]) * 1000).toFixed(2);
+          break;
+      case 'TB':
+      case 'TO':
+          newSize = (parseFloat(sizeA[0]) * 1000 * 1000).toFixed(2);
+          break;
+      case 'KIB':
+          newSize = ((parseFloat(sizeA[0]) * 1024) / 1000 / 1000).toFixed(2);
+          break;
+      case 'MIB':
+          newSize = ((parseFloat(sizeA[0]) * 1024 * 1024) / 1000 / 1000).toFixed(2);
+          break;
+      case 'GIB':
+          newSize = ((parseFloat(sizeA[0]) * 1024 * 1024 * 1024) / 1000 / 1000).toFixed(2);
+          break;
+      case 'TIB':
+          newSize = ((parseFloat(sizeA[0]) * 1024 * 1024 * 1024 * 1024) / 1000 / 1000).toFixed(2);
+          break;
+      default:
+          return size;
+    }
+
+    return newSize;
+  }
+
+  _getAbsoluteUrl(url) {
+    var r = new RegExp('^(?:[a-z]+:)?//', 'i');
+    if(r.test(url) === false) {
+      url = this.baseUrl + ((url.indexOf('/') !== 0) ? '/' : '') + url;
+    }
+
+    return url;
+  }
+
   /**
    *  Parse tracker's search page results
    */
-  parse: function(body) {
+  parse(body) {
     return this._getParseData()
       .then((parseData) => {
         var $ = cheerio.load(body);
@@ -160,34 +281,31 @@ class Tracker {
         }
 
         var torrents = [];
-        const promises = [];
 
-        torrentsEl.forEach((torrentEl) => {
-          var $torrentEl = $(torrentEl);
+        torrentsEl.each((i, elem) => {
+          var $torrentEl = $(elem);
+
+          const fields = {};
+
+          for(let key in parseData.fields) {
+            fields[key] = this._getFieldData($torrentEl, parseData.fields[key]);
+          }
 
           // Parse torrent infos
           var torrent = new Torrent({
-            detailsUrl: $torrentEl.find(parseData.detailsLink).eq(0).attr('href').trim(),
-            name: $torrentEl.find(parseData.title).eq(0).text().trim(),
-            size: $torrentEl.find(parseData.size).eq(0).text().trim(),
-            seeders: parseInt($torrentEl.find(parseData.seeders).eq(0).text().trim()),
-            leechers: parseInt($torrentEl.find(parseData.leechers).eq(0).text().trim()),
+            detailsUrl: (fields.detailsUrl) ? this._getAbsoluteUrl(fields.detailsUrl) : null,
+            name: (fields.name) ? fields.name : null,
+            size: (fields.size) ? this._parseSizeToMB(fields.size) : null,
+            seeders: (fields.seeders) ? parseInt(fields.seeders) : null,
+            leechers: (fields.leechers) ? parseInt(fields.leechers) : null,
             _tracker: this,
             tracker: this.name,
             data: {}
           });
 
           // Parse custom fields
-          for(var paramName in parseData.data) {
-            if(typeof parseData.data[paramName] == 'object') {
-              var regex = new RegExp(parseData.data[paramName].regex);
-              var regexMatches = regex.exec($.html($torrentEl.find(parseData.data[paramName].selector).eq(0)));
-              if(regexMatches != null && regexMatches.length > 1) {
-                torrent.data[paramName] = regexMatches[regexMatches.length - 1].trim();
-              }
-            } else {
-              torrent.data[paramName] = $torrentEl.find(parseData.data[paramName]).eq(0).text().trim();
-            }
+          for(let key in parseData.data) {
+            torrent.data[key] = this._getFieldData($torrentEl, parseData.data[key]);
           }
 
           torrents.push(torrent);
@@ -200,12 +318,15 @@ class Tracker {
   /**
    *  Download a .torrent on the specified tracker
    */
-  download: function(torrent) {
+  download(torrent) {
     return this.login()
-      .then(this._getDownloadData)
+      .then(() => {
+        return this._getDownloadData(torrent);
+      })
       .then((data) => {
+        console.log(data.url);
         return this._request({
-          url: this._urls.download,
+          url: ('url' in data) ? data.url : this._endpoints.download,
           method: data.method,
           headers: data.headers,
           params: data.fields,
@@ -221,9 +342,9 @@ class Tracker {
   /**
    *  Wrapper arround the request module, set default options
    */
-  _request: function(options) {
+  _request(options) {
     // Headers not set in the options, create empty object
-    if(!('headers' in options) || typeof options.headers != 'object') {
+    if(!('headers' in options) || typeof options.headers !== 'object') {
       options.headers = {};
     }
 
@@ -260,7 +381,8 @@ class Tracker {
   /**
    *  Check for string/element inside the provided body to check for login success/failure
    */
-  _checkLoginSuccess: function(body) {
+  _checkLoginSuccess(body) {
+    /*jshint unused:false*/
     return true;
   }
 
@@ -285,6 +407,7 @@ class Tracker {
    *  Needs to be overridden with each tracker's specific fields
    */
   _getSearchData(query, options) {
+    /*jshint unused:false*/
     return Promise.resolve({
       'method': '', // POST, GET
       'fields': {
@@ -322,6 +445,7 @@ class Tracker {
    *  Needs to be overridden with each tracker's specific fields
    */
   _getDownloadData(torrent) {
+    /*jshint unused:false*/
     return Promise.resolve({
       'method': '', // POST, GET
       'fields': {
@@ -332,6 +456,6 @@ class Tracker {
       }
     });
   }
-};
+}
 
 module.exports = Tracker;

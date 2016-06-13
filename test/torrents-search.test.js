@@ -1,6 +1,6 @@
 'use babel';
 
-import chai from 'chai';
+/*import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import extend from 'extend';
 
@@ -35,4 +35,4 @@ describe('TorrentsSearch', () => {
 
     return expect(tmdb.setup()).to.be.rejected;
   });
-});
+});*/

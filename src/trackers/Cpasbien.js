@@ -1,59 +1,43 @@
 import Tracker from '../Tracker';
 
-class Smartorrent extends Tracker {
+const urlify = require('urlify').create({
+  spaces: '-',
+  nonPrintable: '-',
+  trim: true,
+  toLower: true
+});
+
+class Cpasbien extends Tracker {
   constructor(options) {
     super(options);
 
-    this.name = 'Smartorrent';
+    this.name = 'Cpasbien';
 
-    this.baseUrl = 'http://www.smartorrent.com';
-    this._urls = {
+    this.baseUrl = 'http://www.cpasbien.cm';
+    this._endpoints = {
       home:       this.baseUrl +'/',
-      login:      this.baseUrl +'/dispatcheur.php?op=user_login&login_remember=on',
-      loginCheck: this.baseUrl +'/',
-      search:     this.baseUrl +'/?page=search&ordre=sd',
-      download:   this.baseUrl +'/?page=download'
+      search:     this.baseUrl +'/recherche',
+      download:   this.baseUrl +'/telechargement'
     };
-
-    this._cats = {
-      movie: {
-        'cat': 11
-      },
-      tvshow: {}
-    };
-  }
-
-  _checkLoginSuccess(body) {
-    return (body.indexOf('page=abonnement') != -1);
-  }
-
-  _getLoginData() {
-    return Promise.resolve({
-      method: 'POST',
-      fields: {
-        'login_username': this._login.username,
-        'login_password': this._login.password,
-        'op': 'user_login',
-        'login_remember': 'on'
-      },
-      headers: {
-        'Referer': this.baseUrl +'/',
-        'Content-Type': 'application/x-www-form-urlencoded',
-        'Accept': 'application/json, text/javascript, */*; q=0.01',
-        'X-Requested-With': 'XMLHttpRequest',
-        'Connection': 'keep-alive'
-      }
-    });
   }
 
   _getSearchData(query, options) {
+    let url = this._endpoints.search +'/';
+
+    if('type' in options) {
+      if(options.type === 'movie') {
+        url += 'films/';
+      } else if(options.type === 'tvshow') {
+        url += 'series/';
+      }
+    }
+
+    url += urlify(query) +'.html,trie-seeds-d';
+
     return Promise.resolve({
       method: 'GET',
-      fields: {
-        'page': 'search',
-        'ordre': 'sd',
-        'term': query
-      },
+      url: url,
+      fields: {},
       headers: {
         'Referer': this.baseUrl +'/',
         'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
@@ -62,30 +46,25 @@ class Smartorrent extends Tracker {
     });
   }
 
-  _getParseData(callback) {
+  _getParseData() {
     return Promise.resolve({
-      item: 'table#parcourir tbody tr',
-      detailsLink: 'td.nom div+a',
-      title: 'td.nom div+a',
-      size: 'td.taille',
-      seeders: 'td.seed',
-      leechers: 'td.leech',
-      data: {
-        'id': {
-          selector: 'td.nom div+a',
-          regex: '/([0-9]+)/'
-        }
-      }
+      item: '.ligne0, .ligne1',
+      fields: {
+        detailsUrl: ['a.titre', 'href'],
+        name: 'a.titre',
+        size: '.poid',
+        seeders: '.up .seed_ok',
+        leechers: '.down'
+      },
+      data: {}
     });
   }
 
-  _getDownloadData(torrent, callback) {
+  _getDownloadData(torrent) {
     return Promise.resolve({
       method: 'GET',
-      fields: {
-        'page': 'download',
-        'tid': torrent.data.id
-      },
+      url: this._endpoints.download +'/'+ urlify(torrent.name) +'.torrent',
+      fields: {},
       headers: {
         'Referer': this.baseUrl +'/',
       }
@@ -93,4 +72,4 @@ class Smartorrent extends Tracker {
   }
 }
 
-module.exports = Smartorrent;
+module.exports = Cpasbien;

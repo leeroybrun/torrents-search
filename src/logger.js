@@ -1,11 +1,11 @@
 // Default logger, log to nothing...
 
 module.exports = {
-	info: function(message) {
+	info: function() {
 		// Do nothing...
 	},
 
-	error: function(message) {
+	error: function() {
 		// Do nothing...
 	}
 };
