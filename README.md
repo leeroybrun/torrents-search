@@ -146,9 +146,9 @@ Please set the version on your package.json dependencies, this way you will not 
 * Check : https://github.com/SchizoDuckie/DuckieTV/blob/angular/js/services/TorrentSearchEngines/GenericTorrentSearchEngine.js
 * Update README/Examples with new API
 * Add tests
+* Better recognition of torrent quality, language, etc from name
+* Better size transformation/detection (specially for t411)
 * Add more trackers
-    * Cpasbien
-		* torrentfrancais
 		* omgtorrent
 		* zetorrents
 		* http://www.ultimate-torrent.com/
