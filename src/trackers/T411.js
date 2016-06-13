@@ -1,4 +1,7 @@
+import T411 from 't411';
+
 import Tracker from '../Tracker';
+import Torrent from './torrent';
 
 class T411 extends Tracker {
   constructor(options) {
@@ -7,13 +10,8 @@ class T411 extends Tracker {
     this.name = 't411';
 
     this.baseUrl = 'http://www.t411.ch';
-    this._urls = {
-      home:       this.baseUrl +'/',
-      login:      this.baseUrl +'/users/auth/',
-      loginCheck: this.baseUrl +'/',
-      search:     this.baseUrl +'/torrents/search/',
-      download:   this.baseUrl +'/torrents/download/'
-    };
+
+    this.client = new T411();
 
     this._cats = {
       'movie': {
@@ -25,72 +23,95 @@ class T411 extends Tracker {
     };
   }
 
-  _checkLoginSuccess(body) {
-    return (body.indexOf('"status":"OK"') != -1);
-  }
+  isLogged: function() {
+    // Check if already logged in less than 5 minutes ago
+    if(this._login.status && (Date.now() - this._login.lastLogin) < 300000) {
+      return Promise.resolve(true);
+    }
 
-  _getLoginData() {
-    return Promise.resolve({
-      method: 'POST',
-      fields: {
-        'login': this._login.username,
-        'password': this._login.password,
-        'url': '/',
-        'remember': '1'
-      },
-      headers: {
-        'Referer': this.baseUrl +'/',
-        'Content-Type': 'application/x-www-form-urlencoded',
-        'Accept': 'application/json, text/javascript, */*; q=0.01',
-        'X-Requested-With': 'XMLHttpRequest',
-        'Connection': 'keep-alive'
-      }
-    });
-  }
+    // If not logged in or more than 5 minutes ago, we presume that we are not logged anymore and we need to check again
+    this._login.status = false;
 
-  _getSearchData(query, options) {
-    return Promise.resolve({
-      method: 'GET',
-      fields: {
-        'submit': 'Recherche',
-        'order': 'seeders',
-        'type': 'desc',
-        'search': query
-      },
-      headers: {
-        'Referer': this.baseUrl +'/torrents/search/',
-        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-        'Connection': 'keep-alive'
-      }
-    });
-  }
+    // TODO: add check if logged in. Call a method and check for an error
+  },
 
-  _getParseData(callback) {
-    return Promise.resolve({
-      item: 'table.results tbody tr',
-      detailsLink: 'td+td a:first-child',
-      title: 'td+td a:first-child',
-      size: 'td+td+td+td+td+td',
-      seeders: 'td+td+td+td+td+td+td+td',
-      leechers: 'td+td+td+td+td+td+td+td+td',
-      data: {
-        'id': {
-          selector: 'td+td+td a',
-          regex: 'id=([0-9]+)'
+  /**
+   *  Check if we are logged in on the tracker, and if not -> do the login
+   */
+  login: function() {
+    return new Promise((resolve, reject) => {
+      this.client.auth(this._login.username, this._login.password, (err) => {
+        if(err) {
+          return reject(err);
         }
-      }
+
+        retuen resolve();
+      });
     });
   }
 
-  _getDownloadData(torrent, callback) {
-    return Promise.resolve({
-      method: 'GET',
-      fields: {
-        'id': torrent.data.id
-      },
-      headers: {
-        'Referer': this.baseUrl +'/',
-      }
+  /**
+   *  Search for torrents on the tracker
+   */
+  search: function(text, options) {
+    if (typeof text === 'undefined') {
+      return Promise.reject(new Error('Please provide a text to search.'));
+    }
+
+    options = options || {};
+    options.type = options.type || null;
+
+    if(this._cats[options.type]) {
+      extend(options, this._cats[options.type]);
+    }
+
+    return new Promise((resolve, reject) => {
+      this.client.search(text, options, (err, result) => {
+        if(err) {
+          return reject(err);
+        }
+
+        return resolve(this.parse(result));
+      });
+    });
+  }
+
+  /**
+   *  Parse tracker's search page results
+   */
+  parse: function(result) {
+    const torrents = [];
+
+    result.torrents.forEach((torrent) => {
+      torrents.push(new Torrent({
+        //detailsUrl: $torrentEl.find(parseData.detailsLink).eq(0).attr('href').trim(),
+        name: torrent.name,
+        size: torrent.size,
+        seeders: parseInt(torrent.seeders),
+        leechers: parseInt(torrent.leechers),
+        _tracker: this,
+        tracker: this.name,
+        data: {
+          id: torrent.id
+        }
+      }));
+    });
+
+    return torrents;
+  }
+
+  /**
+   *  Download a .torrent on the specified tracker
+   */
+  download: function(torrent) {
+    return new Promise((resolve, reject) => {
+      this.client.download(torrent.data.id, (err, buf) => {
+        if(err) {
+          return reject(err);
+        }
+
+        return resolve(buf);
+      })
     });
   }
 }

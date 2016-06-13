@@ -3,6 +3,8 @@ import cheerio from 'cheerio';
 import async from 'async';
 import extend from 'extend';
 
+import Torrent from './torrent';
+
 // Tracker class
 class Tracker {
   /*********************************************************
@@ -91,7 +93,7 @@ class Tracker {
 
         return this._getLoginData((data) => {
           return this._request({
-            url: that._urls.login,
+            url: this._urls.login,
             method: data.method,
             form: data.fields,
             headers: data.headers
@@ -122,7 +124,7 @@ class Tracker {
     }
 
     options = options || {};
-    options.type = options.type || 'movie';
+    options.type = options.type || null;
 
     return this.login()
       .then(this._getSearchData)
@@ -132,7 +134,7 @@ class Tracker {
         }
 
         return this._request({
-          url: that._urls.search,
+          url: this._urls.search,
           method: data.method,
           headers: data.headers,
           params: data.fields
@@ -164,15 +166,16 @@ class Tracker {
           var $torrentEl = $(torrentEl);
 
           // Parse torrent infos
-          var torrent = {
+          var torrent = new Torrent({
             detailsUrl: $torrentEl.find(parseData.detailsLink).eq(0).attr('href').trim(),
-            title: $torrentEl.find(parseData.title).eq(0).text().trim(),
+            name: $torrentEl.find(parseData.title).eq(0).text().trim(),
             size: $torrentEl.find(parseData.size).eq(0).text().trim(),
             seeders: parseInt($torrentEl.find(parseData.seeders).eq(0).text().trim()),
             leechers: parseInt($torrentEl.find(parseData.leechers).eq(0).text().trim()),
-            tracker: that.name,
+            _tracker: this,
+            tracker: this.name,
             data: {}
-          }
+          });
 
           // Parse custom fields
           for(var paramName in parseData.data) {

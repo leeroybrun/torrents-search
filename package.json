@@ -16,10 +16,11 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "async": "^0.2.10",
     "cheerio": "^0.13.1",
     "extend": "^3.0.0",
-    "request": "^2.72.0"
+    "parse-torrent-name": "^0.5.4",
+    "request": "^2.72.0",
+    "t411": "^1.0.5"
   },
   "devDependencies": {
     "babel-preset-es2015": "^6.9.0",
