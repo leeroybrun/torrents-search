@@ -84,20 +84,34 @@ search.loadTrackers()
 
 ## Events
 
-* on(`trackers:loaded`, function(trackers) {})
-	When trackers are loaded.
-* on(`tracker:enabled`, function(tracker) {})
-	When a tracker is enabled.
-* on(`tracker:disabled`, function(tracker) {})
-	When a tracker is disabled.
-* on(`tracker:loginSuccess`, function(tracker) {})
-	When a login is successfull on a tracker.
-* on(`tracker:torrentsFound`, function(torrents, tracker) {})
-	When torrents are found on a tracker.
-* on(`tracker:torrentsSearchError`, function(error, tracker) {})
-	When an error occurs during torrents search on a tracker.
-* on(`tracker:torrentsSearchError`, function(error, tracker) {})
-	When an error occurs during torrents search on a tracker.
+* `on(trackers:loaded, function(trackers) {})`
+
+		When trackers are loaded.
+
+* `on(tracker:enabled, function(tracker) {})`
+
+		When a tracker is enabled.
+
+* `on(tracker:disabled, function(tracker) {})`
+
+		When a tracker is disabled.
+
+* `on(tracker:loginSuccess, function(tracker) {})`
+
+		When a login is successfull on a tracker.
+
+* `on(tracker:torrentsFound, function(torrents, tracker) {})`
+
+		When torrents are found on a tracker.
+
+* `on(tracker:torrentsSearchError, function(error, tracker) {})`
+
+		When an error occurs during torrents search on a tracker.
+
+* `on(tracker:torrentsSearchError, function(error, tracker) {})`
+
+		When an error occurs during torrents search on a tracker.
+		
 
 ## API
 
