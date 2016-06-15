@@ -86,32 +86,32 @@ search.loadTrackers()
 
 * `on(trackers:loaded, function(trackers) {})`
 
-		When trackers are loaded.
+	When trackers are loaded.
 
 * `on(tracker:enabled, function(tracker) {})`
 
-		When a tracker is enabled.
+	When a tracker is enabled.
 
 * `on(tracker:disabled, function(tracker) {})`
 
-		When a tracker is disabled.
+	When a tracker is disabled.
 
 * `on(tracker:loginSuccess, function(tracker) {})`
 
-		When a login is successfull on a tracker.
+	When a login is successfull on a tracker.
 
 * `on(tracker:torrentsFound, function(torrents, tracker) {})`
 
-		When torrents are found on a tracker.
+	When torrents are found on a tracker.
 
 * `on(tracker:torrentsSearchError, function(error, tracker) {})`
 
-		When an error occurs during torrents search on a tracker.
+	When an error occurs during torrents search on a tracker.
 
 * `on(tracker:torrentsSearchError, function(error, tracker) {})`
 
-		When an error occurs during torrents search on a tracker.
-		
+	When an error occurs during torrents search on a tracker.
+
 
 ## API
 
@@ -122,7 +122,7 @@ Here is the list of all available methods of the module.
     Load all the trackers in the `lib/trackers` folder.
     You need to call this before calling any other method.
     All trackers loaded are disabled by default if they need authentification, or enabled if not.
-
+    
     It returns a promise.
 
 * `getTrackers()`
@@ -132,14 +132,14 @@ Here is the list of all available methods of the module.
 * `enableTracker(trackerName)`
 
     Enable the specified tracker.
-
-		Returns a boolean indicating if the operation succeeded or not.
+    
+    Returns a boolean indicating if the operation succeeded or not.
 
 * `disableTracker(trackerName)`
 
     Disable the specified tracker.
-
-		Returns a boolean indicating if the operation succeeded or not.
+    
+    Returns a boolean indicating if the operation succeeded or not.
 
 * `setCredentials(trackerName, username, password)`
 
@@ -149,23 +149,23 @@ Here is the list of all available methods of the module.
 
     Login on all enabled trackers.
     This is automatically done when using a method requiring login (search, download).
-
+    
     It returns a promise.
 
 * `search(query, options, callback)`
 
     Search the specified `query` on all enabled trackers.
-
-    Options is an object with the following values :
-
+    
+    Options is an object with the following properties :
+    
     * `type` : `movie` or `tvshow`
-
+    
     It returns a promise with an array of Torrent objects if resolved.
 
 * `download(torrent, callback)`
 
     Download the specified `.torrent`.
-
+    
     It returns a promise with an the file buffer of the `.torrent` if resolved.
 
 ## TODO
