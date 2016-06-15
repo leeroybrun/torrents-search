@@ -1,4 +1,6 @@
-import parseTorrentName from 'parse-torrent-name';
+import TorrentNameParser from 'torrent-name-parse';
+
+const parser = new TorrentNameParser();
 
 class Torrent {
   constructor(data) {
@@ -12,7 +14,7 @@ class Torrent {
     this.data = data.data || {};
 
     // Parse torrent name to get informations about quality, etc
-    this.infos = (this.name) ? parseTorrentName(this.name) : {};
+    this.infos = (this.name) ? parser.parse(this.name) : {};
   }
 
   download() {

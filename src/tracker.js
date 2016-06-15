@@ -1,6 +1,7 @@
 import request from 'request';
 import cheerio from 'cheerio';
 import extend from 'extend';
+import XRegExp from 'xregexp';
 
 import Torrent from './torrent';
 
@@ -153,11 +154,10 @@ class Tracker {
       });
   }
 
-  _getFieldData($elm, field) {
+  _getFieldData($elm, fieldName, field) {
     let selector = null;
     let attr = null;
     let regex = null;
-    let matchWanted = 1;
 
     // Field just a selector string
     if (typeof field === 'string') {
@@ -167,13 +167,11 @@ class Tracker {
       selector    = field[0];
       attr        = (field[1]) ? field[1] : null;
       regex       = (field[2]) ? field[2] : null;
-      matchWanted = (field[3]) ? field[3] : matchWanted;
     // Field is an object of type {selector: 'selector', attr: 'attribute', re: 'regexp']
     } else if (typeof field === 'object') {
       selector    = field.selector;
       attr        = (field.attr) ? field.attr : null;
       regex       = (field.regex) ? field.regex : null;
-      matchWanted = (field.matchWanted) ? field.matchWanted : matchWanted;
     }
 
     if(!selector) {
@@ -202,9 +200,10 @@ class Tracker {
     }
 
     if(regex !== null) {
-      let matches = value.match(new RegExp(regex));
-      if(matches !== null && matches.length > matchWanted) {
-        value = matches[matchWanted+1].trim();
+      regex = XRegExp(regex, 'ig');
+      let matches = XRegExp.exec(value, regex);
+      if(matches !== null && fieldName in matches && matches[fieldName]) {
+        value = matches[fieldName].trim();
       }
     }
 
@@ -288,7 +287,7 @@ class Tracker {
           const fields = {};
 
           for(let key in parseData.fields) {
-            fields[key] = this._getFieldData($torrentEl, parseData.fields[key]);
+            fields[key] = this._getFieldData($torrentEl, key, parseData.fields[key]);
           }
 
           // Parse torrent infos
@@ -305,7 +304,7 @@ class Tracker {
 
           // Parse custom fields
           for(let key in parseData.data) {
-            torrent.data[key] = this._getFieldData($torrentEl, parseData.data[key]);
+            torrent.data[key] = this._getFieldData($torrentEl, key, parseData.data[key]);
           }
 
           torrents.push(torrent);

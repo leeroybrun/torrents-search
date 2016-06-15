@@ -81,14 +81,12 @@ class Frenchtorrentdb extends Tracker {
         'id': {
           selector: 'td:nth-child(3) a',
           attr: 'href',
-          regex: '(&|&amp;|\\?)id=([0-9]+)',
-          matchWanted: 1
+          regex: '(&|&amp;|\\?)id=(?<id>[0-9]+)'
         },
         'filename': {
           selector: 'td:nth-child(3) a',
           attr: 'href',
-          regex: '(&|&amp;)name=([a-zA-Z0-9_% .-]+)',
-          matchWanted: 1
+          regex: '(&|&amp;)name=(?<filename>[a-zA-Z0-9_% .-]+)'
         }
       }
     });
