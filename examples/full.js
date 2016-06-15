@@ -30,8 +30,7 @@ search.loadTrackers()
 		search.setCredentials('FrenchTorrentDB', 'USERNAME', 'PASSWORD');
 
 		// Enable a tracker
-		search.enableTracker('Smartorrent');
-		search.setCredentials('Smartorrent', 'USERNAME', 'PASSWORD');
+		search.enableTracker('Cpasbien');
 	})
 	.then(() => {
 		// Search torrents on all enabled trackers
@@ -39,6 +38,13 @@ search.loadTrackers()
 	})
 	.then((torrents) => {
 		console.log(torrents.length +' torrent(s) found.');
+
+		torrents.forEach((torrent) => {
+      const t = extend(true, {}, torrent);
+      delete t._tracker;
+
+      console.log(t);
+    });
 
 		console.log('Downloading first torrent :');
 		return search.download(torrents[0]);

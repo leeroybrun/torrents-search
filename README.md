@@ -7,8 +7,8 @@ Node module used to search torrents on private trackers websites.
 ## Currently supported trackers
 
 - t411
-- Smartorrent
 - FrenchTorrentDB
+- Cpasbien
 
 You can easily add new trackers by creating a file in `lib/trackers`.
 
