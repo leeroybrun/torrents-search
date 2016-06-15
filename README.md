@@ -21,10 +21,10 @@ npm install torrents-search
 ## Usage
 
 ```javascript
-var TorrentsSearch = require('torrents-search');
+const TorrentsSearch = require('torrents-search');
 
 // Custom logger
-var myLogger = {
+const myLogger = {
 	info: function(msg) {
 		console.log(msg);
 	},
@@ -34,43 +34,47 @@ var myLogger = {
 	}
 };
 
-var torrents = new TorrentsSearch({
+const search = new TorrentsSearch({
 	logger: myLogger, // Optional
 	timeout: 100000 // Optional
 });
 
-torrents.loadTrackers(function(err) {
-	if(err) { console.log(err); return; }
+search.loadTrackers()
+	.then(() => {
+		// Display all loaded trackers
+		console.log('Loaded trackers :', search.getTrackers());
 
-	// Display all loaded trackers
-	console.log('Loaded trackers :', torrents.getTrackers());
+		// Enable a tracker
+		search.enableTracker('t411');
+		search.setCredentials('t411', 'USERNAME', 'PASSWORD');
 
-	// Enable a tracker
-	torrents.enableTracker('t411');
-	torrents.setCredentials('t411', 'USERNAME', 'PASSWORD');
+		// Enable a tracker
+		search.enableTracker('FrenchTorrentDB');
+		search.setCredentials('FrenchTorrentDB', 'USERNAME', 'PASSWORD');
 
-	// Enable a tracker
-	torrents.enableTracker('FrenchTorrentDB');
-	torrents.setCredentials('FrenchTorrentDB', 'USERNAME', 'PASSWORD');
+		// Enable a tracker
+		search.enableTracker('Cpasbien');
+	})
+	.then(() => {
+		// Search torrents on all enabled trackers
+		return search.search('spiderman', {type: 'movie'});
+	})
+	.then((torrents) => {
+		console.log(torrents.length +' torrent(s) found.');
 
-	// Enable a tracker
-	torrents.enableTracker('Smartorrent');
-	torrents.setCredentials('Smartorrent', 'USERNAME', 'PASSWORD');
+		torrents.forEach((torrent) => {
+      const t = extend(true, {}, torrent);
+      delete t._tracker;
 
-	// Search torrents on all enabled trackers
-	torrents.search('spiderman', {type: 'movie', quality: 'dvdrip'}, function(err, torrentsFound) {
-		if(err) { console.error(err); return; }
-
-		console.log(torrentsFound.length +' torrent(s) found.');
+      console.log(t);
+    });
 
 		console.log('Downloading first torrent :');
-		torrents.download(torrentsFound[0], function(err, torrentFileBuffer) {
-			if(err) { console.error(err); return; }
-
-			console.log(torrentFileBuffer);
-		});
+		return search.download(torrents[0]);
+	})
+	.then((torrentFileBuffer) => {
+		console.log(torrentFileBuffer);
 	});
-});
 ```
 
 ## Options
@@ -78,40 +82,61 @@ torrents.loadTrackers(function(err) {
 * `logger` This let you define a custom logger. It should have two methods : `info` and `error`. If you just want to log errors, just create an empty `info` method. Default is an empty logger that will do nothing.
 * `timeout` Define the desired timeout (milliseconds) for requests sent to trackers. Default is 10000 (10s). This is a way to protect us from slow trackers who can block others.
 
+## Events
+
+* on(`trackers:loaded`, function(trackers) {})
+	When trackers are loaded.
+* on(`tracker:enabled`, function(tracker) {})
+	When a tracker is enabled.
+* on(`tracker:disabled`, function(tracker) {})
+	When a tracker is disabled.
+* on(`tracker:loginSuccess`, function(tracker) {})
+	When a login is successfull on a tracker.
+* on(`tracker:torrentsFound`, function(torrents, tracker) {})
+	When torrents are found on a tracker.
+* on(`tracker:torrentsSearchError`, function(error, tracker) {})
+	When an error occurs during torrents search on a tracker.
+* on(`tracker:torrentsSearchError`, function(error, tracker) {})
+	When an error occurs during torrents search on a tracker.
+
 ## API
 
 Here is the list of all available methods of the module.
 
-* `loadTrackers(callback)`
+* `loadTrackers()`
 
     Load all the trackers in the `lib/trackers` folder.
     You need to call this before calling any other method.
-    All trackers loaded are disabled by default.
+    All trackers loaded are disabled by default if they need authentification, or enabled if not.
 
-    The callback function takes only an `error` argument.
+    It returns a promise.
 
 * `getTrackers()`
 
-    Return an array with the names of all loaded trackers.
+    Return an object `{ enabled: [], disabled: [] }` with the names of the loaded trackers.
 
 * `enableTracker(trackerName)`
 
     Enable the specified tracker.
 
+		Returns a boolean indicating if the operation succeeded or not.
+
 * `disableTracker(trackerName)`
 
     Disable the specified tracker.
+
+		Returns a boolean indicating if the operation succeeded or not.
 
 * `setCredentials(trackerName, username, password)`
 
     Set the username/password used for the tracker.
 
-* `login(callback)`
+* `login()`
 
     Login on all enabled trackers.
     This is automatically done when using a method requiring login (search, download).
 
-    The callback only takes an `error` argument.
+    It returns a promise.
 
 * `search(query, options, callback)`
 
@@ -119,37 +144,21 @@ Here is the list of all available methods of the module.
 
     Options is an object with the following values :
 
-    * `type` : `movie` or `tvshow` (only movie is supported yet)
-    * `quality` : `dvdrip`, `bluray`, `screener` (WIP)
+    * `type` : `movie` or `tvshow`
 
-    The callback takes 2 arguments :
-
-    * `error`
-    * `torrentsFound` An array with all the torrents found on enabled trackers.
+    It returns a promise with an array of Torrent objects if resolved.
 
 * `download(torrent, callback)`
 
-    Download the specified `torrent`.
+    Download the specified `.torrent`.
 
-    The callback takes 2 arguments :
-
-    * `error`
-    * `torrentFileBuff` A buffer of the downloaded torrent file.
-
-## Warning
-
-This module is currently in active development, the API can change a lot.
-Please set the version on your package.json dependencies, this way you will not be affected by any `npm update`.
+    It returns a promise with an the file buffer of the `.torrent` if resolved.
 
 ## TODO
 
-* Check : https://github.com/SchizoDuckie/DuckieTV/blob/angular/js/services/TorrentSearchEngines/GenericTorrentSearchEngine.js
-* Update README/Examples with new API
 * Add tests
-* Better recognition of torrent quality, language, etc from name
-* Better size transformation/detection (specially for t411)
+* Better size transformation/detection (especially for t411)
 * Add more trackers
-		* omgtorrent
 		* zetorrents
 		* http://www.ultimate-torrent.com/
 		* http://www.qctorrent.io/login

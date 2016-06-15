@@ -51,6 +51,8 @@ class TorrentsSearch extends events.EventEmitter {
           this.trackers.push(new (require(filePath))(this.options));
         });
 
+        this.emit('trackers:loaded', this.trackers);
+
         resolve();
       });
     });
@@ -151,14 +153,14 @@ class TorrentsSearch extends events.EventEmitter {
 
                 torrentsFound = torrentsFound.concat(torrents);
 
-                this.emit('tracker:torrentsFound', torrents);
+                this.emit('tracker:torrentsFound', torrents, tracker);
               }
 
               return resolve();
             }).catch((reason) => {
               this.logger.error('['+tracker.name+'] Error during search', reason);
 
-              this.emit('tracker:torrentsSearchError', reason);
+              this.emit('tracker:torrentsSearchError', reason, tracker);
 
               return resolve();
             });
