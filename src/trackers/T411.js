@@ -18,12 +18,10 @@ class T411 extends Tracker {
 
     this._cats = {
       'movie': {
-        'cat': '210',
-        'subcat': '631'
+        'cid': 631
       },
       'tvshow': {
-        'cat': '210',
-        'subcat': '433'
+        'cid': 433
       }
     };
   }
