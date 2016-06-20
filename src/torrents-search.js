@@ -53,7 +53,7 @@ class TorrentsSearch extends events.EventEmitter {
 
         this.emit('trackers:loaded', this.trackers);
 
-        resolve();
+        resolve(this.trackers);
       });
     });
   }
