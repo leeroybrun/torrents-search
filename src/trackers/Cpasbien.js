@@ -50,6 +50,7 @@ class Cpasbien extends Tracker {
     return Promise.resolve({
       item: '.ligne0, .ligne1',
       fields: {
+        id: ['a.titre', 'href', '\/(?<id>[^.\/]+)\.(?=[^.]*$)'],
         detailsUrl: ['a.titre', 'href'],
         name: 'a.titre',
         size: '.poid',

@@ -1,4 +1,5 @@
 const TorrentsSearch = require('..');
+const extend = require('extend');
 
 // Custom logger
 const myLogger = {

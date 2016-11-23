@@ -88,6 +88,7 @@ class T411 extends Tracker {
     result.torrents.forEach((torrent) => {
       torrents.push(new Torrent({
         //detailsUrl: $torrentEl.find(parseData.detailsLink).eq(0).attr('href').trim(),
+        id: torrent.id,
         name: torrent.name,
         size: torrent.size,
         seeders: parseInt(torrent.seeders),

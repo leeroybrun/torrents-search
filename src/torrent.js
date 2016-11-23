@@ -4,6 +4,7 @@ const parser = new TorrentNameParser();
 
 class Torrent {
   constructor(data) {
+    this.id = (data.id) ? `${data.tracker.toLowerCase()}-${String(data.id).toLowerCase()}` : null; // ID field is trackername-torrentid
     this.detailsUrl = data.detailsUrl || null;
     this.name = data.name || null;
     this.size = data.size || null;

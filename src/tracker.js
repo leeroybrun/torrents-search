@@ -292,6 +292,7 @@ class Tracker {
 
           // Parse torrent infos
           var torrent = new Torrent({
+            id: (fields.id) ? fields.id : null,
             detailsUrl: (fields.detailsUrl) ? this._getAbsoluteUrl(fields.detailsUrl) : null,
             name: (fields.name) ? fields.name : null,
             size: (fields.size) ? this._parseSizeToMB(fields.size) : null,
@@ -425,11 +426,14 @@ class Tracker {
   _getParseData() {
     return Promise.resolve({
       'item': '',
-      'detailsLink': '',
-      'title': '',
-      'size': '',
-      'seeders': '',
-      'leechers': '',
+      fields: {
+        id: '',
+        detailsUrl: '',
+        name: '',
+        size: '',
+        seeders: '',
+        leechers: ''
+      },
       'data': {
         'field': {
           'selector': '',

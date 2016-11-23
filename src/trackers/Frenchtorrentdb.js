@@ -71,6 +71,7 @@ class Frenchtorrentdb extends Tracker {
     return Promise.resolve({
       item: 'table.ttable_headinner tr.t-row',
       fields: {
+        id: ['td:nth-child(3) a', 'href', '(?:&|&amp;|\\?)id=(?<id>[0-9]+)'],
         detailsUrl: ['td:nth-child(2) a', 'href'],
         name: ['td:nth-child(2) a', 'title'],
         size: 'td:nth-child(6)',
