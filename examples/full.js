@@ -47,7 +47,7 @@ search.loadTrackers()
       console.log(t);
     });
 
-		console.log('Downloading first torrent :');
+		console.log('Downloading first torrent ('+ torrents[0].name +' from '+ torrents[0].tracker +') :');
 		return search.download(torrents[0]);
 	})
 	.then((torrentFileBuffer) => {
