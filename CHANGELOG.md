@@ -2,5 +2,5 @@
 
 ### v1.0.2
 
-[x] Add an ID field to each torrents.
-[x] Bugfix `download` method in TorrentsSearch.
+- [x] Add an ID field to each torrents.
+- [x] Bugfix `download` method in TorrentsSearch.
