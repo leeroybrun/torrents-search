@@ -1,6 +1,6 @@
 {
   "name": "torrents-search",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "author": "Leeroy Brun <leeroy.brun@gmail.com>",
   "description": "Search torrents on private trackers websites (t411, Smartorrent, FrenchTorrentDB)",
   "repository": {
