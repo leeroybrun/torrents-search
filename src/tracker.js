@@ -324,7 +324,6 @@ class Tracker {
         return this._getDownloadData(torrent);
       })
       .then((data) => {
-        console.log(data.url);
         return this._request({
           url: ('url' in data) ? data.url : this._endpoints.download,
           method: data.method,

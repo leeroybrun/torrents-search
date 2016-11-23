@@ -175,21 +175,19 @@ class TorrentsSearch extends events.EventEmitter {
   }
 
   download(torrent) {
-    return new Promise((resolve, reject) => {
-      var tracker = this._findTracker(torrent.tracker);
+    var tracker = this._findTracker(torrent.tracker);
 
-      if(tracker !== null) {
-        if(tracker.enabled) {
-          return tracker.download(torrent);
-        } else {
-          this.logger.error('['+tracker.name+'] Cannot download torrent. Tracker not enabled.');
-          return reject(new Error('Tracker not enabled.'));
-        }
+    if(tracker !== null) {
+      if(tracker.enabled) {
+        return tracker.download(torrent);
       } else {
-        this.logger.error('['+tracker.name+'] Cannot download torrent. Tracker not found.');
-        return reject(new Error('Tracker not found.'));
+        this.logger.error('['+tracker.name+'] Cannot download torrent. Tracker not enabled.');
+        return Promise.reject(new Error('Tracker not enabled.'));
       }
-    });
+    } else {
+      this.logger.error('['+tracker.name+'] Cannot download torrent. Tracker not found.');
+      return Promise.reject(new Error('Tracker not found.'));
+    }
   }
 
   _findTracker(trackerName) {
