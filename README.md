@@ -7,7 +7,6 @@ Node module used to search torrents on private trackers websites.
 ## Currently supported trackers
 
 - t411
-- FrenchTorrentDB
 - Cpasbien
 
 You can easily add new trackers by creating a file in `lib/trackers`.
@@ -184,6 +183,16 @@ Here is the list of all available methods of the module.
 	* http://torrentz.eu/
 	* http://www.torrenthounds.com/
 	* https://isohunt.to/
+
+
+## Changelog
+
+### v1.0.4
+
+- Update depencencies
+- Remove FrenchTorrentDB (dead)
+- Update Cpasbien domain
+
 
 Licence
 ======================
