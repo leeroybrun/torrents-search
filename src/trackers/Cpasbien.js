@@ -13,7 +13,7 @@ class Cpasbien extends Tracker {
 
     this.name = 'Cpasbien';
 
-    this.baseUrl = 'http://www.cpasbien.cm';
+    this.baseUrl = 'http://www.cpasbien.xyz';
     this._endpoints = {
       home:       this.baseUrl +'/',
       search:     this.baseUrl +'/recherche',

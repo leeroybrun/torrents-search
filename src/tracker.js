@@ -89,7 +89,7 @@ class Tracker {
     return new Promise((resolve, reject) => {
       this.isLogged().then((status) => {
         if(status === true) {
-          return resolve(); // This way we stop the waterfall, we are already logged in
+          return resolve(); // We are already logged in
         }
 
         this._getLoginData().then((data) => {
@@ -118,6 +118,8 @@ class Tracker {
         }).catch((reason) => {
           return reject(reason);
         });
+      }).catch((reason) => {
+        return reject(reason);
       });
     });
   }
