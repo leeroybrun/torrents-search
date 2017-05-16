@@ -10,7 +10,7 @@ class T411 extends Tracker {
 
     this.name = 't411';
 
-    this.baseUrl = 'http://www.t411.ch';
+    this.baseUrl = 'http://www.t411.al';
 
     this.loginRequired = true;
 
