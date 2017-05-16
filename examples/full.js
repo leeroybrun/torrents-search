@@ -27,10 +27,6 @@ search.loadTrackers()
 		search.setCredentials('t411', 'USERNAME', 'PASSWORD');
 
 		// Enable a tracker
-		search.enableTracker('FrenchTorrentDB');
-		search.setCredentials('FrenchTorrentDB', 'USERNAME', 'PASSWORD');
-
-		// Enable a tracker
 		search.enableTracker('Cpasbien');
 	})
 	.then(() => {
@@ -52,4 +48,6 @@ search.loadTrackers()
 	})
 	.then((torrentFileBuffer) => {
 		console.log(torrentFileBuffer);
-	});
+	}).catch((reason) => {
+    console.error(reason);
+  });
