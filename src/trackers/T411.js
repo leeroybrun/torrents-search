@@ -42,6 +42,7 @@ class T411 extends Tracker {
 
     if(this.client.token) {
       this._login.status = true;
+      this._login.lastLogin = Date.now();
       return Promise.resolve(true);
     }
 
@@ -64,6 +65,9 @@ class T411 extends Tracker {
             this.errorHandler(err);
             return reject(err);
           }
+
+          this._login.status = true;
+          this._login.lastLogin = Date.now();
 
           return resolve();
         });
