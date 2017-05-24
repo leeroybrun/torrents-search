@@ -26,16 +26,27 @@ class T411 extends Tracker {
     };
   }
 
+  // TODO: retry request when token/auth error?
+  errorHandler(err) {
+    // Token errors
+    if(err.code === 202 || err.code === 201) {
+      this._login.status = false;
+    }
+  }
+
   isLogged() {
-    // Check if already logged in less than 5 minutes ago
-    if(this._login.status && (Date.now() - this._login.lastLogin) < 300000) {
+    // Check if already logged in less than 50 minutes ago
+    if(this._login.status && (Date.now() - this._login.lastLogin) < 3000000) {
       return Promise.resolve(true);
     }
 
-    // If not logged in or more than 5 minutes ago, we presume that we are not logged anymore and we need to check again
-    this._login.status = false;
+    if(this.client.token) {
+      this._login.status = true;
+      return Promise.resolve(true);
+    }
 
-    // TODO: add check if logged in. Call a method and check for an eventual error
+    this._login.status = false;
+    return Promise.resolve(false);
   }
 
   /**
@@ -43,12 +54,19 @@ class T411 extends Tracker {
    */
   login() {
     return new Promise((resolve, reject) => {
-      this.client.auth(this._login.username, this._login.password, (err) => {
-        if(err) {
-          return reject(err);
+      this.isLogged().then((isLogged) => {
+        if(isLogged) {
+          return resolve();
         }
 
-        return resolve();
+        this.client.auth(this._login.username, this._login.password, (err) => {
+          if(err) {
+            this.errorHandler(err);
+            return reject(err);
+          }
+
+          return resolve();
+        });
       });
     });
   }
@@ -69,12 +87,17 @@ class T411 extends Tracker {
     }
 
     return new Promise((resolve, reject) => {
-      this.client.search(text, options, (err, result) => {
-        if(err) {
-          return reject(err);
-        }
+      this.login().then(() => {
+        this.client.search(text, options, (err, result) => {
+          if(err) {
+            this.errorHandler(err);
+            return reject(err);
+          }
 
-        return resolve(this.parse(result));
+          return resolve(this.parse(result));
+        });
+      }).catch((reason) => {
+        return reject(reason);
       });
     });
   }
@@ -109,12 +132,17 @@ class T411 extends Tracker {
    */
   download(torrent) {
     return new Promise((resolve, reject) => {
-      this.client.download(torrent.data.id, (err, buf) => {
-        if(err) {
-          return reject(err);
-        }
+      this.login().then(() => {
+        this.client.download(torrent.data.id, (err, buf) => {
+          if(err) {
+            this.errorHandler(err);
+            return reject(err);
+          }
 
-        return resolve(buf);
+          return resolve(buf);
+        });
+      }).catch((reason) => {
+        return reject(reason);
       });
     });
   }
