@@ -185,6 +185,10 @@ Here is the list of all available methods of the module.
 
 ## Changelog
 
+### v1.1.0
+
+- Size of torrents is now in bytes
+
 ### v1.0.4
 
 - Update depencencies

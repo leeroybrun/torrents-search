@@ -212,7 +212,7 @@ class Tracker {
     return value;
   }
 
-  _parseSizeToMB(size) {
+  _parseSizeToBytes(size) {
     size = (typeof size !== 'undefined' && size !== null) ? size : '0 MB';
     var sizeA = size.split(/\s{1}/); // size split into value and unit
 
@@ -221,35 +221,23 @@ class Tracker {
       case 'B':
       case 'BYTES':
       case 'O':
-          newSize = (parseFloat(sizeA[0]) / 1000 / 1000).toFixed(2);
+          newSize = (parseFloat(sizeA[0])).toFixed(2);
           break;
       case 'KB':
       case 'KO':
-          newSize = (parseFloat(sizeA[0]) / 1000).toFixed(2);
+          newSize = (parseFloat(sizeA[0]) * 1000).toFixed(2);
           break;
       case 'MB':
       case 'MO':
-          newSize = (parseFloat(sizeA[0])).toFixed(2);
+          newSize = (parseFloat(sizeA[0]) * 1000 * 1000).toFixed(2);
           break;
       case 'GB':
       case 'GO':
-          newSize = (parseFloat(sizeA[0]) * 1000).toFixed(2);
+          newSize = (parseFloat(sizeA[0]) * 1000 * 1000 * 1000).toFixed(2);
           break;
       case 'TB':
       case 'TO':
-          newSize = (parseFloat(sizeA[0]) * 1000 * 1000).toFixed(2);
-          break;
-      case 'KIB':
-          newSize = ((parseFloat(sizeA[0]) * 1024) / 1000 / 1000).toFixed(2);
-          break;
-      case 'MIB':
-          newSize = ((parseFloat(sizeA[0]) * 1024 * 1024) / 1000 / 1000).toFixed(2);
-          break;
-      case 'GIB':
-          newSize = ((parseFloat(sizeA[0]) * 1024 * 1024 * 1024) / 1000 / 1000).toFixed(2);
-          break;
-      case 'TIB':
-          newSize = ((parseFloat(sizeA[0]) * 1024 * 1024 * 1024 * 1024) / 1000 / 1000).toFixed(2);
+          newSize = (parseFloat(sizeA[0]) * 1000 * 1000 * 1000 * 1000).toFixed(2);
           break;
       default:
           return size;
@@ -297,7 +285,7 @@ class Tracker {
             id: (fields.id) ? fields.id : null,
             detailsUrl: (fields.detailsUrl) ? this._getAbsoluteUrl(fields.detailsUrl) : null,
             name: (fields.name) ? fields.name : null,
-            size: (fields.size) ? this._parseSizeToMB(fields.size) : null,
+            size: (fields.size) ? this._parseSizeToBytes(fields.size) : null,
             seeders: (fields.seeders) ? parseInt(fields.seeders) : null,
             leechers: (fields.leechers) ? parseInt(fields.leechers) : null,
             _tracker: this,
