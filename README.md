@@ -57,7 +57,7 @@ search.loadTrackers()
   })
   .then(() => {
     // Search torrents on all enabled trackers
-    return search.search('SEARCH_QUERY', {type: 'movie'});
+    return search.search('SEARCH_QUERY', {type: 'movies'});
   })
   .then((torrents) => {
     console.log(torrents.length +' torrent(s) found.');
