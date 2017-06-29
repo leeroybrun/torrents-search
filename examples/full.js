@@ -3,51 +3,55 @@ const extend = require('extend');
 
 // Custom logger
 const myLogger = {
-	info: function(msg) {
-		console.log(msg);
-	},
+  info: function(msg) {
+    console.log(msg);
+  },
 
-	error: function(msg) {
-		console.error(msg);
-	}
+  error: function(msg) {
+    console.error(msg);
+  }
 };
 
 const search = new TorrentsSearch({
-	logger: myLogger, // Optional
-	timeout: 100000 // Optional
+  logger: myLogger, // Optional
+  timeout: 100000 // Optional
 });
 
 search.loadTrackers()
-	.then(() => {
-		// Display all loaded trackers
-		console.log('Loaded trackers :', search.getTrackers());
+  .then(() => {
+    // Display all loaded trackers
+    console.log('Loaded trackers :', search.getTrackers());
 
-		// Enable a tracker
-		search.enableTracker('t411');
-		search.setCredentials('t411', 'USERNAME', 'PASSWORD');
+    // Enable trackers
+    search.enableTracker('Torrent9');
+    search.enableTracker('1337x');
+  })
+  .then(() => {
+    // Search torrents on all enabled trackers
+    return search.search('SEARCH_QUERY', {type: 'movie'});
+  })
+  .then((torrents) => {
+    console.log(torrents.length +' torrent(s) found.');
 
-		// Enable a tracker
-		search.enableTracker('Cpasbien');
-	})
-	.then(() => {
-		// Search torrents on all enabled trackers
-		return search.search('spiderman', {type: 'movie'});
-	})
-	.then((torrents) => {
-		console.log(torrents.length +' torrent(s) found.');
+    if(torrents.length === 0) {
+      return null;
+    }
 
-		torrents.forEach((torrent) => {
+    torrents.forEach((torrent) => {
       const t = extend(true, {}, torrent);
       delete t._tracker;
 
       console.log(t);
     });
 
-		console.log('Downloading first torrent ('+ torrents[0].name +' from '+ torrents[0].tracker +') :');
-		return search.download(torrents[0]);
-	})
-	.then((torrentFileBuffer) => {
-		console.log(torrentFileBuffer);
-	}).catch((reason) => {
+    console.log('Downloading first torrent ('+ torrents[0].name +' from '+ torrents[0].tracker +') :');
+    return search.download(torrents[0]);
+  })
+  .then((torrentFileBuffer) => {
+    if(torrentFileBuffer) {
+      console.log(torrentFileBuffer);
+    }
+  }).catch((reason) => {
+    console.error('An error occured:');
     console.error(reason);
   });

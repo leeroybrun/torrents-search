@@ -1,4 +1,4 @@
-import Tracker from '../Tracker';
+const Tracker = require('../Tracker');
 
 const urlify = require('urlify').create({
   spaces: '-',
@@ -11,35 +11,25 @@ class Torrent9 extends Tracker {
   constructor(options) {
     super(options);
 
-    this.name = 'Torrent9';
+    const baseUrl = 'http://www.torrent9.cc';
 
-    this.baseUrl = 'http://www.torrent9.cc';
-    this._endpoints = {
-      home:       this.baseUrl +'/',
-      search:     this.baseUrl +'/search_torrent',
-      download:   this.baseUrl +'/get_torrent'
-    };
-  }
+    this.setBaseInfos({
+      name: 'Torrent9',
 
-  _getSearchData(query, options) {
-    let url = this._endpoints.search +'/';
+      baseUrl: baseUrl,
+      endpoints: {
+        home:       baseUrl +'/',
+        search:     baseUrl +'/search_torrent/{query}.html,trie-seeds-d',
+        searchCat:  baseUrl +'/search_torrent/{cat}/{query}.html,trie-seeds-d',
+        download:   baseUrl +'/get_torrent'
+      },
 
-    if('type' in options) {
-      if(options.type === 'movie') {
-        url += 'films/';
-      } else if(options.type === 'tvshow') {
-        url += 'series/';
-      }
-    }
-
-    url += urlify(query) +'.html,trie-seeds-d';
-
-    return Promise.resolve({
-      method: 'GET',
-      url: url,
-      fields: {},
-      headers: {
-        'Referer': this.baseUrl +'/'
+      cats: {
+        movies: 'films',
+        tvshows: 'series',
+        music: 'musique',
+        softwares: 'logiciels',
+        books: 'ebook'
       }
     });
   }
@@ -48,14 +38,15 @@ class Torrent9 extends Tracker {
     return Promise.resolve({
       item: 'table.table tbody > tr',
       fields: {
-        id: ['a', 'href', '\/(?<id>[^.\/]+)$'],
-        detailsUrl: ['a', 'href'],
+        id: 'a@href | regex:\/(?<id>[^.\/]+)$:id',
+        detailsUrl: 'a@href',
         name: 'a',
-        size: 'td:nth-child(2)',
+        size: 'td:nth-child(2) | parseSizeToBytes',
         seeders: '.seed_ok',
         leechers: 'td:nth-child(4)'
       },
-      data: {}
+      data: {},
+      paginateSelector: 'a:has(strong:contains(Suiv))@href'
     });
   }
 

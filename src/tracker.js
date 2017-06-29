@@ -1,9 +1,23 @@
-import request from 'request';
-import cheerio from 'cheerio';
-import extend from 'extend';
-import XRegExp from 'xregexp';
+'use strict';
 
-import Torrent from './torrent';
+const request = require('request');
+const cheerio = require('cheerio');
+const extend = require('extend');
+
+const urlify = require('urlify').create({
+  spaces: '-',
+  nonPrintable: '-',
+  trim: true,
+  toLower: true
+});
+
+const format = require('string-format');
+
+const Xray = require('x-ray');
+const makeRequestDriver = require('request-x-ray');
+
+const filters = require('./filters');
+const Torrent = require('./torrent');
 
 // Tracker class
 class Tracker {
@@ -26,12 +40,16 @@ class Tracker {
       'login':      '',
       'loginCheck': '',
       'search':     '',
+      'searchCat':  '',
       'download':   ''
     };
 
     this._cats = {
-      'movie': {},
-      'tvshow': {}
+      movie: null,
+      tvshow: null,
+      music: null,
+      software: null,
+      books: null
     };
 
     this._login = {
@@ -41,7 +59,26 @@ class Tracker {
       password: ''
     };
 
+    this._defaultHeaders = {
+      'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_3) AppleWebKit/537.31 (KHTML, like Gecko) Chrome/26.0.1410.65 Safari/537.31'
+    };
+
     this._cookies = request.jar();
+
+    this._x = Xray({ filters });
+        
+    this._x.driver(makeRequestDriver({
+      method: 'GET',
+      jar: this._cookies,
+      headers: this._defaultHeaders
+    }));
+  }
+
+  setBaseInfos(infos) {
+    this.name = infos.name;
+    this.baseUrl = infos.baseUrl;
+    this._endpoints = extend(this._endpoints, infos.endpoints);
+    this._cats = extend(this._cats, infos.cats);
   }
 
   /*********************************************************
@@ -124,6 +161,21 @@ class Tracker {
     });
   }
 
+  _getSearchUrl(query, options) {
+    // Category (type) defined in the options, use category search URL
+    if(options.type && this._cats[options.type]) {
+      return format(this._endpoints.catSearch, {
+        query: query,
+        cat: this._cats[options.type]
+      });
+    // No type/category defined, use main search URL
+    } else {
+      return format(this._endpoints.search, {
+        query: query
+      });
+    }
+  }
+
   /**
    *  Search for torrents on the tracker
    */
@@ -134,116 +186,58 @@ class Tracker {
 
     options = options || {};
     options.type = options.type || null;
+    options.limit = options.limit || 1;
 
     return this.login()
       .then(() => {
         return this._getSearchData(text, options);
       })
       .then((data) => {
-        if(this._cats[options.type]) {
-          data.fields = extend(data.fields, this._cats[options.type]);
-        }
+        const url = (data.url) ? data.url : this._getSearchUrl(text, options);
 
-        return this._request({
-          url: ('url' in data) ? data.url : this._endpoints.search,
-          method: data.method,
-          headers: data.headers,
-          params: data.fields
-        });
-      })
-      .then((body) => {
-        return this.parse(body);
+        return this._search(url, options.limit);
       });
   }
 
-  _getFieldData($elm, fieldName, field) {
-    let selector = null;
-    let attr = null;
-    let regex = null;
+  _processSearchResults(results, parseData) {
+    return results.map(r => {
+      const torrent = new Torrent({
+        id: r.id || null,
+        detailsUrl: (r.detailsUrl) ? this._getAbsoluteUrl(r.detailsUrl) : null,
+        name: r.name || null,
+        size: r.size || null,
+        seeders: (r.seeders) ? parseInt(r.seeders) : null,
+        leechers: (r.leechers) ? parseInt(r.leechers) : null,
+        _tracker: this,
+        tracker: this.name,
+        data: {}
+      });
 
-    // Field just a selector string
-    if (typeof field === 'string') {
-      selector = field;
-    // Field is an array of ['selector', 'attribute', 'regexp']
-    } else if (Array.isArray(field)) {
-      selector    = field[0];
-      attr        = (field[1]) ? field[1] : null;
-      regex       = (field[2]) ? field[2] : null;
-    // Field is an object of type {selector: 'selector', attr: 'attribute', re: 'regexp']
-    } else if (typeof field === 'object') {
-      selector    = field.selector;
-      attr        = (field.attr) ? field.attr : null;
-      regex       = (field.regex) ? field.regex : null;
-    }
+      Object.keys(parseData.data).forEach((dataKey) => {
+        torrent.data[dataKey] = r[dataKey];
+      });
 
-    if(!selector) {
-      return null;
-    }
-
-    let $fieldElm = $elm.find(selector);
-
-    if($fieldElm.length === 0) {
-      return null;
-    }
-
-    $fieldElm = $fieldElm.eq(0);
-
-    if(!$fieldElm) {
-      return null;
-    }
-
-    let value = null;
-    if(attr !== null) {
-      if($fieldElm.attr(attr)) {
-        value = $fieldElm.attr(attr).trim();
-      }
-    } else {
-      value = $fieldElm.text().trim();
-    }
-
-    if(regex !== null) {
-      regex = XRegExp(regex, 'ig');
-      let matches = XRegExp.exec(value, regex);
-      if(matches !== null && fieldName in matches && matches[fieldName]) {
-        value = matches[fieldName].trim();
-      }
-    }
-
-    return value;
+      return torrent;
+    });
   }
 
-  _parseSizeToBytes(size) {
-    size = (typeof size !== 'undefined' && size !== null) ? size : '0 MB';
-    var sizeA = size.split(/\s{1}/); // size split into value and unit
+  _search(url, limit) {
+    return this._getParseData().then((parseData) => {
+      const fields = extend({}, parseData.fields, parseData.data);
 
-    var newSize = null; // size converted to MB
-    switch (sizeA[1].toUpperCase()) {
-      case 'B':
-      case 'BYTES':
-      case 'O':
-          newSize = (parseFloat(sizeA[0])).toFixed(2);
-          break;
-      case 'KB':
-      case 'KO':
-          newSize = (parseFloat(sizeA[0]) * 1000).toFixed(2);
-          break;
-      case 'MB':
-      case 'MO':
-          newSize = (parseFloat(sizeA[0]) * 1000 * 1000).toFixed(2);
-          break;
-      case 'GB':
-      case 'GO':
-          newSize = (parseFloat(sizeA[0]) * 1000 * 1000 * 1000).toFixed(2);
-          break;
-      case 'TB':
-      case 'TO':
-          newSize = (parseFloat(sizeA[0]) * 1000 * 1000 * 1000 * 1000).toFixed(2);
-          break;
-      default:
-          return size;
-    }
+      return new Promise((resolve, reject) => {
+        this._x(url, parseData.item, [fields])
+          .paginate(parseData.paginateSelector)
+          .limit(limit)
+          ((err, results) => {
+            if(err) {
+              return reject(err);
+            }
 
-    return newSize;
+            return resolve(this._processSearchResults(results, parseData));
+          });
+      });
+    });
   }
 
   _getAbsoluteUrl(url) {
@@ -253,56 +247,6 @@ class Tracker {
     }
 
     return url;
-  }
-
-  /**
-   *  Parse tracker's search page results
-   */
-  parse(body) {
-    return this._getParseData()
-      .then((parseData) => {
-        var $ = cheerio.load(body);
-        var torrentsEl = $(parseData.item);
-
-        // No torrents found
-        if (torrentsEl.length === 0) {
-          return [];
-        }
-
-        var torrents = [];
-
-        torrentsEl.each((i, elem) => {
-          var $torrentEl = $(elem);
-
-          const fields = {};
-
-          for(let key in parseData.fields) {
-            fields[key] = this._getFieldData($torrentEl, key, parseData.fields[key]);
-          }
-
-          // Parse torrent infos
-          var torrent = new Torrent({
-            id: (fields.id) ? fields.id : null,
-            detailsUrl: (fields.detailsUrl) ? this._getAbsoluteUrl(fields.detailsUrl) : null,
-            name: (fields.name) ? fields.name : null,
-            size: (fields.size) ? this._parseSizeToBytes(fields.size) : null,
-            seeders: (fields.seeders) ? parseInt(fields.seeders) : null,
-            leechers: (fields.leechers) ? parseInt(fields.leechers) : null,
-            _tracker: this,
-            tracker: this.name,
-            data: {}
-          });
-
-          // Parse custom fields
-          for(let key in parseData.data) {
-            torrent.data[key] = this._getFieldData($torrentEl, key, parseData.data[key]);
-          }
-
-          torrents.push(torrent);
-        });
-
-        return torrents;
-      });
   }
 
   /**
@@ -398,13 +342,7 @@ class Tracker {
   _getSearchData(query, options) {
     /*jshint unused:false*/
     return Promise.resolve({
-      'method': '', // POST, GET
-      'fields': {
-
-      },
-      'headers': {
-
-      }
+      url: null
     });
   }
 

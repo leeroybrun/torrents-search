@@ -1,6 +1,5 @@
 node_modules/
 *.sublime*
 examples/_*
-dist/
 .DS_Store
 npm-debug.log

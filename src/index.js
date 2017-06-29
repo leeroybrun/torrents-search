@@ -1,8 +1,8 @@
-import fs from 'fs';
-import path from 'path';
-import events from 'events';
+const fs = require('fs');
+const path = require('path');
+const events = require('events');
 
-import defaultLogger from './logger';
+const defaultLogger = require('./logger');
 
 class TorrentsSearch extends events.EventEmitter {
   constructor(options) {
@@ -158,7 +158,8 @@ class TorrentsSearch extends events.EventEmitter {
 
               return resolve();
             }).catch((reason) => {
-              this.logger.error('['+tracker.name+'] Error during search', reason);
+              this.logger.error('['+tracker.name+'] An error occured during search', reason);
+              this.logger.error(reason);
 
               this.emit('tracker:torrentsSearchError', reason, tracker);
 

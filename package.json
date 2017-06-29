@@ -1,50 +1,43 @@
 {
   "name": "torrents-search",
-  "version": "1.1.0",
+  "version": "2.0.0",
   "author": "Leeroy Brun <leeroy.brun@gmail.com>",
-  "description": "Search torrents on private trackers websites (t411, Smartorrent, FrenchTorrentDB)",
+  "description": "Search torrents on private and public trackers websites",
   "repository": {
     "type": "git",
     "url": "https://github.com/leeroybrun/node-torrents-search.git"
   },
   "keywords": [
     "torrents",
-    "t411",
-    "smartorrent",
+    "1337x",
+    "torrent9",
     "private tracker",
     "tracker"
   ],
   "license": "MIT",
   "dependencies": {
-    "cheerio": "^0.22.0",
     "debug": "^2.6.6",
     "extend": "^3.0.1",
-    "torrent-name-parse": "~1.1.0",
     "request": "^2.81.0",
-    "t411": "^1.0.8",
+    "request-x-ray": "^0.1.4",
+    "string-format": "^0.5.0",
+    "torrent-name-parse": "~1.1.0",
     "urlify": "^0.3.6",
+    "x-ray": "^2.3.2",
     "xregexp": "^3.2.0"
   },
   "devDependencies": {
-    "babel-preset-es2015": "^6.24.1",
-    "babel-register": "^6.24.1",
     "chai": "^3.5.0",
     "jshint": "^2.9.4",
     "mocha": "^3.4.1"
   },
-  "engines": [
-    "node"
-  ],
+  "engines": {
+    "node": "8.0.0"
+  },
   "scripts": {
     "jshint": "jshint src/. test/. --config",
-    "build": "npm run jshint && babel src --presets babel-preset-es2015 --out-dir dist",
-    "prepublish": "npm run build",
     "mocha": "mocha test/ --compilers js:babel-core/register",
     "test": "npm run jshint && npm run mocha"
   },
-  "xo": {
-    "esnext": true,
-    "space": 2
-  },
-  "main": "./dist/torrents-search.js"
+  "main": "./src"
 }

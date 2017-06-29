@@ -6,8 +6,11 @@ Node module used to search torrents on private trackers websites.
 
 ## Currently supported trackers
 
-- t411
-- Cpasbien
+- 1337x
+- Torrent9
+- ~~Cpasbien~~
+- ~~t411~~
+- ~~FrenchTorrentDB~~
 
 You can easily add new trackers by creating a file in `lib/trackers`.
 
@@ -20,7 +23,7 @@ npm install torrents-search
 ## Usage
 
 ```javascript
-const TorrentsSearch = require('torrents-search');
+const TorrentsSearch = require('..');
 const extend = require('extend');
 
 // Custom logger
@@ -44,19 +47,20 @@ search.loadTrackers()
     // Display all loaded trackers
     console.log('Loaded trackers :', search.getTrackers());
 
-    // Enable a tracker
-    search.enableTracker('t411');
-    search.setCredentials('t411', 'USERNAME', 'PASSWORD');
-
-    // Enable a tracker
-    search.enableTracker('Cpasbien');
+    // Enable trackers
+    search.enableTracker('Torrent9');
+    search.enableTracker('1337x');
   })
   .then(() => {
     // Search torrents on all enabled trackers
-    return search.search('spiderman', {type: 'movie'});
+    return search.search('SEARCH_QUERY', {type: 'movie'});
   })
   .then((torrents) => {
     console.log(torrents.length +' torrent(s) found.');
+
+    if(torrents.length === 0) {
+      return null;
+    }
 
     torrents.forEach((torrent) => {
       const t = extend(true, {}, torrent);
@@ -69,8 +73,11 @@ search.loadTrackers()
     return search.download(torrents[0]);
   })
   .then((torrentFileBuffer) => {
-    console.log(torrentFileBuffer);
+    if(torrentFileBuffer) {
+      console.log(torrentFileBuffer);
+    }
   }).catch((reason) => {
+    console.error('An error occured:');
     console.error(reason);
   });
 ```
@@ -168,10 +175,15 @@ Here is the list of all available methods of the module.
 
 ## TODO
 
-* Add tests
-* Better size transformation/detection (especially for t411)
-* Add more trackers
-	
+- [ ] Add tests
+- [ ] Use [x-rax](https://www.npmjs.com/package/x-ray)
+- [ ] Use [string-format](https://www.npmjs.com/package/string-format)
+- Add more trackers
+  - [x] Torrent9
+  - [x] 1337x
+  - [ ] iptorrents
+  - [ ] torrentleech
+  - [ ] torrentproject
 	* zetorrents
 	* http://www.ultimate-torrent.com/
 	* http://www.qctorrent.io/login
@@ -185,15 +197,26 @@ Here is the list of all available methods of the module.
 
 ## Changelog
 
+### v2.0.0
+
+- [x] Refactor Tracker class to use [x-rax](https://www.npmjs.com/package/x-ray)
+- [x] Remove Babel
+- [x] Switch to yarn
+- [x] Cleanup
+- [x] Remove t411 tracker
+- [x] Remove Cpasbien tracker
+- [x] Add 1337x tracker
+- [x] Add Torrent9 tracker
+
 ### v1.1.0
 
-- Size of torrents in bytes
+- [x] Size of torrents in bytes
 
 ### v1.0.4
 
-- Update depencencies
-- Remove FrenchTorrentDB (dead)
-- Update Cpasbien domain
+- [x] Update depencencies
+- [x] Remove FrenchTorrentDB (dead)
+- [x] Update Cpasbien domain
 
 
 Licence

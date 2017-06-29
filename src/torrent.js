@@ -1,4 +1,4 @@
-import TorrentNameParser from 'torrent-name-parse';
+const TorrentNameParser = require('torrent-name-parse');
 
 const parser = new TorrentNameParser();
 
