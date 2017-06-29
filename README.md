@@ -8,6 +8,7 @@ Node module used to search torrents on private trackers websites.
 
 - 1337x
 - Torrent9
+- TorrentLeech
 - ~~Cpasbien~~
 - ~~t411~~
 - ~~FrenchTorrentDB~~
@@ -50,6 +51,9 @@ search.loadTrackers()
     // Enable trackers
     search.enableTracker('Torrent9');
     search.enableTracker('1337x');
+
+    search.enableTracker('TorrentLeech');
+    search.setCredentials('TorrentLeech', 'USERNAME', 'PASSWORD');
   })
   .then(() => {
     // Search torrents on all enabled trackers
@@ -181,21 +185,17 @@ Here is the list of all available methods of the module.
 - Add more trackers
   - [x] Torrent9
   - [x] 1337x
-  - [ ] iptorrents
-  - [ ] torrentleech
+  - [x] torrentleech
+  - [ ] katcr.co/new
   - [ ] torrentproject
-	* zetorrents
-	* http://www.ultimate-torrent.com/
-	* http://www.qctorrent.io/login
-	* http://www.zone-torrent.net/
-	* http://www.megatorrent.biz/
-	* lien-torrent
-	* http://torrentz.eu/
-	* http://www.torrenthounds.com/
-	* https://isohunt.to/
+  - [ ] iptorrents
 
 
 ## Changelog
+
+### v2.0.1
+
+- [x] Add TorrentLeech tracker
 
 ### v2.0.0
 

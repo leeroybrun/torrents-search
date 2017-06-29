@@ -77,6 +77,7 @@ class Tracker {
   setBaseInfos(infos) {
     this.name = infos.name;
     this.baseUrl = infos.baseUrl;
+    this.loginRequired = infos.loginRequired || false;
     this._endpoints = extend(this._endpoints, infos.endpoints);
     this._cats = extend(this._cats, infos.cats);
   }

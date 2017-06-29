@@ -16,6 +16,18 @@ exports.until = (value, str) => {
   return typeof value === 'string' && value.indexOf(str) > 0 ? value.substr(0, value.indexOf(str)) : value;
 }
 
+exports.since = (value, str) => {
+  return typeof value === 'string' && value.indexOf(str) > 0 ? value.substr(value.indexOf(str)+str.length, value.length) : value;
+}
+
+exports.trim = (value) => {
+  return value.trim();
+}
+
+exports.toDate = (value) => {
+  return new Date(value);
+}
+
 exports.parseSizeToBytes = (size) => {
   size = (typeof size !== 'undefined' && size !== null) ? size : '0 MB';
   var sizeA = size.split(/\s{1}/); // size split into value and unit

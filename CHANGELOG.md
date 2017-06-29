@@ -1,5 +1,9 @@
 ## Changelog
 
+### v2.0.1
+
+- [x] Add TorrentLeech tracker
+
 ### v2.0.0
 
 - [x] Refactor Tracker class to use [x-rax](https://www.npmjs.com/package/x-ray)

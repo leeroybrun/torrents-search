@@ -25,6 +25,9 @@ search.loadTrackers()
     // Enable trackers
     search.enableTracker('Torrent9');
     search.enableTracker('1337x');
+
+    search.enableTracker('TorrentLeech');
+    search.setCredentials('TorrentLeech', 'USERNAME', 'PASSWORD');
   })
   .then(() => {
     // Search torrents on all enabled trackers

@@ -1,6 +1,6 @@
 {
   "name": "torrents-search",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "author": "Leeroy Brun <leeroy.brun@gmail.com>",
   "description": "Search torrents on private and public trackers websites",
   "repository": {
@@ -32,7 +32,7 @@
     "mocha": "^3.4.1"
   },
   "engines": {
-    "node": "8.0.0"
+    "node": ">=6.0.0"
   },
   "scripts": {
     "jshint": "jshint src/. test/. --config",
