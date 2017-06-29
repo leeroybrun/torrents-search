@@ -75,11 +75,25 @@ class Tracker {
   }
 
   setBaseInfos(infos) {
-    this.name = infos.name;
-    this.baseUrl = infos.baseUrl;
-    this.loginRequired = infos.loginRequired || false;
-    this._endpoints = extend(this._endpoints, infos.endpoints);
-    this._cats = extend(this._cats, infos.cats);
+    if('name' in infos) {
+      this.name = infos.name;
+    }
+
+    if('baseUrl' in infos) {
+      this.baseUrl = infos.baseUrl;
+    }
+    
+    if('loginRequired' in infos) {
+      this.loginRequired = infos.loginRequired;
+    }
+    
+    if('endpoints' in infos) {
+      this._endpoints = extend(this._endpoints, infos.endpoints);
+    }
+    
+    if('cats' in infos) {
+      this._cats = extend(this._cats, infos.cats);
+    }
   }
 
   /*********************************************************
@@ -163,16 +177,17 @@ class Tracker {
   }
 
   _getSearchUrl(query, options) {
+    console.log(options);
     // Category (type) defined in the options, use category search URL
     if(options.type && this._cats[options.type]) {
-      return format(this._endpoints.catSearch, {
-        query: query,
+      return format(this._endpoints.searchCat, {
+        query: urlify(query), // URLEncode instead of urlify?
         cat: this._cats[options.type]
       });
     // No type/category defined, use main search URL
     } else {
       return format(this._endpoints.search, {
-        query: query
+        query: urlify(query)
       });
     }
   }
@@ -195,6 +210,8 @@ class Tracker {
       })
       .then((data) => {
         const url = (data.url) ? data.url : this._getSearchUrl(text, options);
+
+        console.log(url);
 
         return this._search(url, options.limit);
       });

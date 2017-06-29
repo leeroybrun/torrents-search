@@ -193,6 +193,10 @@ Here is the list of all available methods of the module.
 
 ## Changelog
 
+### v2.0.2
+
+- [x] Bugfixes
+
 ### v2.0.1
 
 - [x] Add TorrentLeech tracker
