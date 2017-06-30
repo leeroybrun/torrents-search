@@ -1,4 +1,4 @@
-const Tracker = require('../Tracker');
+const Tracker = require('../tracker');
 
 const urlify = require('urlify').create({
   spaces: '-',

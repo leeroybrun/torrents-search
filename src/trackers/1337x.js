@@ -1,4 +1,4 @@
-const Tracker = require('../Tracker');
+const Tracker = require('../tracker');
 
 class _1337x extends Tracker {
   constructor(options) {
