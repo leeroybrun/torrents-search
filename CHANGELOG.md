@@ -1,5 +1,9 @@
 ## Changelog
 
+### v2.0.3
+
+- [x] Fix typo
+
 ### v2.0.2
 
 - [x] Bugfixes

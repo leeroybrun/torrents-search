@@ -193,6 +193,10 @@ Here is the list of all available methods of the module.
 
 ## Changelog
 
+### v2.0.3
+
+- [x] Fix typo
+
 ### v2.0.2
 
 - [x] Bugfixes
