@@ -177,7 +177,6 @@ class Tracker {
   }
 
   _getSearchUrl(query, options) {
-    console.log(options);
     // Category (type) defined in the options, use category search URL
     if(options.type && this._cats[options.type]) {
       return format(this._endpoints.searchCat, {
@@ -210,8 +209,6 @@ class Tracker {
       })
       .then((data) => {
         const url = (data.url) ? data.url : this._getSearchUrl(text, options);
-
-        console.log(url);
 
         return this._search(url, options.limit);
       });
