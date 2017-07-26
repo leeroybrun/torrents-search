@@ -1,5 +1,9 @@
 ## Changelog
 
+### v2.0.5
+
+- [x] Fix "regex" x-ray filter to get IDs of Torrent9 & 1337x torrents
+
 ### v2.0.3
 
 - [x] Fix typo
