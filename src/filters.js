@@ -1,13 +1,10 @@
 const XRegExp = require('xregexp');
 
 exports.regex = (value, regexStr, fieldName) => {
-  console.log(value);
-  console.log(regexStr);
   let result = null;
   const regex = XRegExp(regexStr, 'ig');
 
   let matches = XRegExp.exec(value, regex);
-  console.log(matches);
   if(matches !== null && fieldName in matches && matches[fieldName]) {
     result = matches[fieldName].trim();
   }
