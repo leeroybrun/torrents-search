@@ -30,7 +30,7 @@ class _1337x extends Tracker {
     return Promise.resolve({
       item: 'tbody > tr',
       fields: {
-        id: 'a:nth-child(2)@href | regex:\/(?<id>[^.\/]+)\/$:id',
+        id: 'a:nth-child(2)@href | regex:\\/torrent\\/(?<id>[^.\\/]+)\\/,id',
         detailsUrl: 'a:nth-child(2)@href',
         name: 'a:nth-child(2)',
         size: '.size@html | until:<sp | parseSizeToBytes',

@@ -38,7 +38,7 @@ class Torrent9 extends Tracker {
     return Promise.resolve({
       item: 'table.table tbody > tr',
       fields: {
-        id: 'a@href | regex:\/(?<id>[^.\/]+)$:id',
+        id: 'a@href | regex:\/(?<id>[^.\/]+)$,id',
         detailsUrl: 'a@href',
         name: 'a',
         size: 'td:nth-child(2) | parseSizeToBytes',
